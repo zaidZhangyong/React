@@ -1,45 +1,43 @@
 import { Menu } from 'antd';
 import * as AllIcons from '@ant-design/icons';
 import Router from '../router';
-
-interface MenuItem {
-    key?: string,
-    icon?: string | keyof typeof AllIcons;
-    title?: string;
-    children?: MenuItem[];
+import type { MenuProps } from 'antd';
+import { createElement } from 'react';
+// keyof typeof AllIcons
+type RouterMenuItem = {
+    icon?: string;
+    title: string;
+    path?: string;
+    children?: RouterMenuItem[];
 }
+type MenuItem = Required<MenuProps>['items'][number];
+export default function LeftMenu(props: { jump: (arg0: { key: any; }) => void; }) {
 
-export default function LeftMenu() {
     const MenuList = Router.filter(item => item.title === 'layout')[0]?.children || [];
+    function Menuitems(menuList: RouterMenuItem[]): MenuItem[] {
+        // path: item.path,
 
-    function Menuitems(menuList: MenuItem[]): MenuItem[] {
-        return menuList.map(item => {
-            if (item.children && item.children.length > 0) {
-                return {
-                    key: item.title,
-                    icon: item.icon || AllIcons[item.icon as keyof typeof AllIcons],
-                    label: item.title,
-                    children: Menuitems(item.children), // Recursively call Menuitems for children
-                };
-            } else {
-                return {
-                    key: item.title,
-                    icon: item.icon || AllIcons[item.icon as keyof typeof AllIcons],
-                    label: item.title,
-                };
-            }
-        });
+        return menuList.map(item => ({
+            key: item.path || null,
+            label: item.title,
+            path: item.path,
+            icon: item.icon ? createElement(AllIcons[item.icon] as React.ComponentType) : undefined,
+            children: item.children ? Menuitems(item.children) : null,
+        }));
+
     }
+    const toggleCollapsed = (e: any) => {
+        props.jump({ key: e.key })
 
-
+    };
 
     return (
         <div>
             <Menu
                 mode="inline"
-                // defaultSelectedKeys={['1']}
-                // defaultOpenKeys={['sub1']}
+                theme="dark"
                 style={{ height: '100%' }}
+                onClick={toggleCollapsed}
                 items={Menuitems(MenuList)}
             />
         </div>

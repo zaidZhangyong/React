@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react"  //lazy 懒加载 需要嵌套React.Suspense
+import { lazy } from "react"  //lazy 懒加载 需要嵌套React.Suspense
 import Login from "@/views/Login"
 import Layout from "@/views/Layout"
 const About = lazy(() => import("@/views/About")) //使用懒加载
@@ -49,15 +49,11 @@ const routes = [
     },
     {
         path: '/about',
-        element: <Suspense fallback={<div>Loading...</div>}>
-            <About />
-        </Suspense>
+        element: <About />
     },
     {
-        path: '/404',
-        element: <Suspense fallback={<div>Loading...</div>}>
-            <Error404 />
-        </Suspense>
+        path: '/*',
+        element: <Error404 />
     },
 
 ]

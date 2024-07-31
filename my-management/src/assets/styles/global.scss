@@ -1,0 +1,24 @@
+.flexSB {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.flexC {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profilePicture {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-left: 5px;
+
+    img {
+        width: 100%;
+        height: 100%;
+    }
+}

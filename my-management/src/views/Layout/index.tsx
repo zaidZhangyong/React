@@ -1,48 +1,32 @@
-import React, { useState } from 'react';
-import { Button, Layout, theme } from 'antd';
-import {
-    MenuFoldOutlined,
-    MenuUnfoldOutlined,
+import React, { useState, useRef } from 'react';
+import { Layout, theme } from 'antd';
 
-} from '@ant-design/icons';
-import Router from '../../router';
 import LeftMenu from '@/components/LeftMenu';
+import HeadOptions from "@/components/HeadOptions";
 const { Header, Content, Footer, Sider } = Layout;
-import { Outlet, useNavigate, Link } from "react-router-dom"
+import { Outlet, useNavigate } from "react-router-dom"
 import styles from "./index.module.scss"
-
 const App: React.FC = () => {
+    const leftMenuRef = useRef(null)
     const navigate = useNavigate();
-
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
     const [collapsed, setCollapsed] = useState(false);
+    const jump = (path: string, type?: string) => {
+        navigate(path);
 
-    const jump = (page: any) => {
-        navigate(page.key);
     }
 
     return (
         <Layout style={{ minHeight: '100vh' }}>
             <Sider trigger={null} collapsible collapsed={collapsed}>
                 <div className={styles.demoLogoVertical} />
-                <LeftMenu jump={jump} />
-                {/* <div onClick={() => jump('/home')}>home</div>
-                <div onClick={() => jump('/accountManagement')}>home2</div> */}
+                <LeftMenu jump={jump} ref={leftMenuRef} />
             </Sider>
             <Layout>
                 <Header style={{ padding: 0, background: colorBgContainer }}>
-                    <Button
-                        type="text"
-                        icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                        onClick={() => setCollapsed(!collapsed)}
-                        style={{
-                            fontSize: '16px',
-                            width: 64,
-                            height: 64,
-                        }}
-                    />
+                    <HeadOptions collapsed={collapsed} setCollapsed={setCollapsed} jump={jump} />
                 </Header>
                 <Content
                     style={{

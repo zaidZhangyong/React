@@ -7,7 +7,7 @@ const { Header, Content, Footer, Sider } = Layout;
 import { Outlet, useNavigate } from "react-router-dom"
 import styles from "./index.module.scss"
 const App: React.FC = () => {
-    const leftMenuRef = useRef(null)
+    // const leftMenuRef = useRef(null)
     const navigate = useNavigate();
     const {
         token: { colorBgContainer, borderRadiusLG },
@@ -22,7 +22,7 @@ const App: React.FC = () => {
         <Layout style={{ minHeight: '100vh' }}>
             <Sider trigger={null} collapsible collapsed={collapsed}>
                 <div className={styles.demoLogoVertical} />
-                <LeftMenu jump={jump} ref={leftMenuRef} />
+                <LeftMenu jump={jump} />
             </Sider>
             <Layout>
                 <Header style={{ padding: 0, background: colorBgContainer }}>

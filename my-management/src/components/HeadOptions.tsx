@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
@@ -12,14 +12,12 @@ import {
 } from '@ant-design/icons';
 import '@/assets/styles/global.scss';
 import icon from "@/assets/images/icon2.png"
+import TabsBox from "./TabsBox.tsx"
 import { Button, Dropdown, Modal } from 'antd';
 import type { MenuProps } from 'antd';
 
 export default function HeadOptions(props: { collapsed: boolean, setCollapsed: Function, jump: Function }) {
-
-
     const items: MenuProps['items'] = [
-
         {
             key: 'personalInformation',
             label: "个人信息",
@@ -79,44 +77,48 @@ export default function HeadOptions(props: { collapsed: boolean, setCollapsed: F
         setIsModalOpen(false);
     };
     return (
-        <div className='flexSB'>
-            <Button
-                type="text"
-                icon={props.collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                onClick={() => props.setCollapsed(!props.collapsed)}
-                style={{
-                    fontSize: '16px',
-                    width: 64,
-                    height: 64,
-                }}
-            />
-
-            <div className='flexC'>
-                <Dropdown menu={{ items, onClick }} >
-                    <div className='flexC'>
-                        <DownOutlined style={{ fontSize: '10px' }} />
-                        <div className='profilePicture'>
-                            <img src={icon} alt="" />
-                        </div>
-                    </div>
-
-                </Dropdown>
-
-                <Modal title="提示" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-                    <p>确认退出吗？</p>
-                </Modal>
-
+        <div className='headBox'>
+            <div className='flexSB'>
                 <Button
                     type="text"
-                    icon={fullScreen ? <FullscreenOutlined /> : <FullscreenExitOutlined />}
-                    onClick={() => fullScreenBut()}
+                    icon={props.collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                    onClick={() => props.setCollapsed(!props.collapsed)}
                     style={{
                         fontSize: '16px',
                         width: 64,
                         height: 64,
                     }}
                 />
+
+                <div className='flexC'>
+                    <Dropdown menu={{ items, onClick }} >
+                        <div className='flexC'>
+                            <DownOutlined style={{ fontSize: '10px' }} />
+                            <div className='profilePicture'>
+                                <img src={icon} alt="" />
+                            </div>
+                        </div>
+                    </Dropdown>
+                    <Modal title="提示" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+                        <p>确认退出吗？</p>
+                    </Modal>
+
+                    <Button
+                        type="text"
+                        icon={fullScreen ? <FullscreenOutlined /> : <FullscreenExitOutlined />}
+                        onClick={() => fullScreenBut()}
+                        style={{
+                            fontSize: '16px',
+                            width: 64,
+                            height: 64,
+                        }}
+                    />
+                </div>
+            </div>
+            <div className='tabsH'>
+                <TabsBox />
             </div>
         </div>
+
     )
 }

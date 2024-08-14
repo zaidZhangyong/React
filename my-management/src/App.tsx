@@ -1,16 +1,10 @@
-import { useRoutes } from "react-router-dom" //hook
+import { useRoutes, Outlet } from "react-router-dom" //hook
 import Router from "./router"
 
 
 function App() {
-  const outlet = useRoutes(Router)
-  return (
-    <>
-      <div className="App">
-        {outlet}
-      </div>
-    </>
-  )
+  const Routers = useRoutes(Router)
+  return Routers
 }
 
 export default App

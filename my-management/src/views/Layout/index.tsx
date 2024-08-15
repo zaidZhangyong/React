@@ -1,12 +1,15 @@
 import React, { useState, useRef } from 'react';
 import { Layout, theme } from 'antd';
-
 import LeftMenu from '@/components/LeftMenu';
 import HeadOptions from "@/components/HeadOptions";
 const { Header, Content, Footer, Sider } = Layout;
 import { Outlet, useNavigate } from "react-router-dom"
+
 import styles from "./index.module.scss"
 const App: React.FC = () => {
+
+    // const navsList = useSelector((state: RootState) => state.navs.navsList);
+    // console.log(navsList,1111)
     // const leftMenuRef = useRef(null)
     const navigate = useNavigate();
     const {
@@ -14,8 +17,8 @@ const App: React.FC = () => {
     } = theme.useToken();
     const [collapsed, setCollapsed] = useState(false);
     const jump = (path: string, type?: string) => {
+     
         navigate(path);
-
     }
 
     return (

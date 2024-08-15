@@ -4,6 +4,8 @@ import Router from '../router';
 import type { MenuProps } from 'antd';
 import { createElement, useState } from 'react';
 import { useLocation } from "react-router-dom"
+import { useSelector, useDispatch } from 'react-redux';
+import { addNavs } from "@/store/reducer/navs"
 // keyof typeof AllIcons
 type RouterMenuItem = {
     icon?: string;
@@ -15,6 +17,9 @@ type RouterMenuItem = {
 }
 type MenuItem = Required<MenuProps>['items'][number];
 export default function LeftMenu(props: { jump: Function }) {
+
+
+    const dispatch = useDispatch();
     const location = useLocation(); //获取当前路由
     let getpath = JSON.parse(sessionStorage.getItem('getkeyPath') || '[]')
     const [keyPath, setKeyPath] = useState(getpath)
@@ -37,6 +42,7 @@ export default function LeftMenu(props: { jump: Function }) {
     const toggleCollapsed: MenuProps['onClick'] = (e) => {
         e.domEvent.preventDefault();
         if (e.key !== location.pathname) {
+            dispatch(addNavs({ label: e.domEvent.currentTarget.innerText, key: e.key }))
             //存储选中的菜单
             sessionStorage.setItem('getkeyPath', JSON.stringify(e.keyPath.slice(1)));
             setKeyPath(e.keyPath.slice(1));

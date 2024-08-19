@@ -4,10 +4,11 @@ import LeftMenu from '@/components/LeftMenu';
 import HeadOptions from "@/components/HeadOptions";
 const { Header, Content, Footer, Sider } = Layout;
 import { Outlet, useNavigate } from "react-router-dom"
-
+import { useSelector, useDispatch } from 'react-redux';
+import type { RootState } from "@/store"
 import styles from "./index.module.scss"
 const App: React.FC = () => {
-
+    const refreshKey = useSelector((state: RootState) => state.navs.refreshKey);
     // const navsList = useSelector((state: RootState) => state.navs.navsList);
     // console.log(navsList,1111)
     // const leftMenuRef = useRef(null)
@@ -17,7 +18,7 @@ const App: React.FC = () => {
     } = theme.useToken();
     const [collapsed, setCollapsed] = useState(false);
     const jump = (path: string, type?: string) => {
-     
+
         navigate(path);
     }
 
@@ -39,8 +40,9 @@ const App: React.FC = () => {
                         background: colorBgContainer,
                         borderRadius: borderRadiusLG,
                     }}
+
                 >
-                    <Outlet />
+                    <Outlet key={refreshKey} />
                 </Content>
                 <Footer style={{ textAlign: 'center' }}>
                     Ant Design ©{new Date().getFullYear()} Created by Ant UED

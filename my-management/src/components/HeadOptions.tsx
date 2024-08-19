@@ -15,8 +15,10 @@ import icon from "@/assets/images/icon2.png"
 import TabsBox from "./TabsBox.tsx"
 import { Button, Dropdown, Modal } from 'antd';
 import type { MenuProps } from 'antd';
-
+import { setShowKey } from "@/store/reducer/navs"
+import { useSelector, useDispatch } from 'react-redux';
 export default function HeadOptions(props: { collapsed: boolean, setCollapsed: Function, jump: Function }) {
+    const dispatch=useDispatch()
     const items: MenuProps['items'] = [
         {
             key: 'personalInformation',
@@ -60,8 +62,9 @@ export default function HeadOptions(props: { collapsed: boolean, setCollapsed: F
             showModal();
             return
         }
-        props.jump(list[key]);
-
+        // props.jump(list[key]);
+        // showKey
+        dispatch(setShowKey(list[key]))
     }
 
     const [isModalOpen, setIsModalOpen] = useState(false);

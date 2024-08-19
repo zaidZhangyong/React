@@ -5,7 +5,9 @@ import type { MenuProps } from 'antd';
 import { createElement, useState } from 'react';
 import { useLocation } from "react-router-dom"
 import { useSelector, useDispatch } from 'react-redux';
-import { addNavs } from "@/store/reducer/navs"
+import type { RootState } from "@/store"
+import { addNavs, setKeyPath, } from "@/store/reducer/navs"
+import React, { useEffect } from 'react';
 // keyof typeof AllIcons
 type RouterMenuItem = {
     icon?: string;
@@ -21,15 +23,13 @@ export default function LeftMenu(props: { jump: Function }) {
 
     const dispatch = useDispatch();
     const location = useLocation(); //获取当前路由
-    let getpath = JSON.parse(sessionStorage.getItem('getkeyPath') || '[]')
-    const [keyPath, setKeyPath] = useState(getpath)
-
+    const keyPath = useSelector((state: RootState) => state.navs.keyPath);
     const MenuList = Router.filter(item => item.title === 'layout')[0]?.children || [];
     function Menuitems(menuList: RouterMenuItem[]): MenuItem[] {
         return menuList.map(item => {
             if (item?.show != false) {
                 return ({
-                    key: item.path || item.key,
+                    key: item.children ? item.key : item.path,
                     label: item.title,
                     path: item.path,
                     icon: item.icon ? createElement(AllIcons[item.icon] as React.ComponentType) : undefined,
@@ -37,32 +37,34 @@ export default function LeftMenu(props: { jump: Function }) {
                 })
             }
         });
-
     }
     const toggleCollapsed: MenuProps['onClick'] = (e) => {
         e.domEvent.preventDefault();
         if (e.key !== location.pathname) {
-            dispatch(addNavs({ label: e.domEvent.currentTarget.innerText, key: e.key }))
+            dispatch(addNavs({ label: e.domEvent.currentTarget.innerText, key: e.key, keyPath: e.keyPath.slice(1) }))
             //存储选中的菜单
-            sessionStorage.setItem('getkeyPath', JSON.stringify(e.keyPath.slice(1)));
-            setKeyPath(e.keyPath.slice(1));
-            props.jump(e.key);
+            // console.log(e.keyPath.slice(1))
+            dispatch(setKeyPath(e.keyPath.slice(1)))
+            // props.jump(e.key);
 
         }
     };
-
-
+    const onOpenChange: MenuProps['onOpenChange'] = (openKeys) => {
+        dispatch(setKeyPath(openKeys))
+    };
     return (
         <div>
+            <span></span>
             <Menu
                 mode="inline"
                 theme="dark"
                 style={{ height: '100%' }}
                 onClick={toggleCollapsed}
-                defaultSelectedKeys={[location.pathname]}
-                defaultOpenKeys={keyPath}
+                selectedKeys={[location.pathname]}
+                openKeys={keyPath}
+                onOpenChange={onOpenChange}
                 items={Menuitems(MenuList)}
             />
-        </div>
+        </div >
     );
 }

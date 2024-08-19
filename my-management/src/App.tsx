@@ -4,7 +4,7 @@ import Router from "./router"
 
 function App() {
   const Routers = useRoutes(Router)
-  return Routers
+  return <>{Routers}</>
 }
 
 export default App

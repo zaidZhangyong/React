@@ -1,15 +1,15 @@
 
 import '@/assets/styles/global.scss';
-import { Tabs, Dropdown } from 'antd';
+import { Tabs, Dropdown, message } from 'antd';
 import type { TabsProps, MenuProps } from 'antd';
 import { LoadingOutlined, CloseOutlined, VerticalAlignMiddleOutlined, VerticalAlignTopOutlined } from '@ant-design/icons';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from "@/store"
-import { removeNavs, setShowKey } from "@/store/reducer/navs"
+import { removeNavs, setShowKey, setKeyPath, setRefreshKey } from "@/store/reducer/navs"
 import { useNavigate, useLocation } from "react-router-dom"
 import React, { useReducer, useEffect } from 'react';
+
 export default function TabsBox() {
-    const [, forceUpdate] = useReducer(x => x + 1, 0);
     const showKey = useSelector((state: RootState) => state.navs.showKey);
     const location = useLocation(); //获取当前路由
     const navs = useSelector((state: RootState) => state.navs);
@@ -82,7 +82,11 @@ export default function TabsBox() {
     const TabsOnClick = (ekey: string, nkey: string) => {
         switch (ekey) {
             case "1":
-                forceUpdate();
+                // forceUpdate();
+                dispatch(setRefreshKey("0"))
+                message.success('刷新成功');
+
+
                 break
             case "2": //删除当前
                 modifyNavs('item', nkey);
@@ -111,6 +115,8 @@ export default function TabsBox() {
     }
 
     const onChange = (key: string) => {
+        let item = navs.navsList.filter(item => item.key == key)[0]
+        dispatch(setKeyPath(item.keyPath))
         dispatch(setShowKey(key))
     };
     const onEdit: TabsProps['onEdit'] = (targetKey, action) => {

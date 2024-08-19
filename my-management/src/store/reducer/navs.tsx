@@ -8,9 +8,13 @@ const navs = createSlice({
         navsList: [{
             label: "首页",
             key: "/home",
+            keyPath: [],
             closable: false
         }],
-        showKey: "/home"
+        showKey: "/home",
+        keyPath: [],
+        openKeys: [],
+        refreshKey: "0"
     },
     reducers: {
         addNavs(state, action) {
@@ -64,10 +68,21 @@ const navs = createSlice({
         setShowKey(state, action) {
             const key = action.payload;
             state.showKey = key
-        }
+        },
+        setKeyPath(state, action) {
+            const key = action.payload;
+            state.keyPath = key
+
+        },
+        setRefreshKey(state, action) {
+            const key = action.payload;
+            state.refreshKey = state.refreshKey + 1
+
+        },
+
 
     }
 });
 
-export const { addNavs, removeNavs, setShowKey } = navs.actions;
+export const { addNavs, removeNavs, setShowKey, setKeyPath, setRefreshKey } = navs.actions;
 export default navs.reducer;

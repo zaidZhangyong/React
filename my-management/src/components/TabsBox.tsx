@@ -2,14 +2,15 @@
 import '@/assets/styles/global.scss';
 import { Tabs, Dropdown, message } from 'antd';
 import type { TabsProps, MenuProps } from 'antd';
-import { LoadingOutlined, CloseOutlined, VerticalAlignMiddleOutlined, VerticalAlignTopOutlined } from '@ant-design/icons';
+import { LoadingOutlined, CloseOutlined, VerticalAlignMiddleOutlined, VerticalAlignTopOutlined, RedoOutlined } from '@ant-design/icons';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from "@/store"
 import { removeNavs, setShowKey, setKeyPath, setRefreshKey } from "@/store/reducer/navs"
 import { useNavigate, useLocation } from "react-router-dom"
-import React, { useReducer, useEffect } from 'react';
+import React, { useReducer, useEffect, useState } from 'react';
 
 export default function TabsBox() {
+
     const showKey = useSelector((state: RootState) => state.navs.showKey);
     const location = useLocation(); //获取当前路由
     const navs = useSelector((state: RootState) => state.navs);
@@ -84,8 +85,7 @@ export default function TabsBox() {
             case "1":
                 // forceUpdate();
                 dispatch(setRefreshKey("0"))
-                message.success('刷新成功');
-
+                message.success('刷新成功')
 
                 break
             case "2": //删除当前
@@ -124,30 +124,64 @@ export default function TabsBox() {
             modifyNavs('item', targetKey as string)
         }
     };
+    const [rotating, setRotating] = useState(false);
+    const handleClick = () => {
+        setRotating(true);
+        // 设置一个延迟，以确保动画完成后移除旋转类
+        setTimeout(() => setRotating(false), 1000); // 1秒，与动画时长匹配
+    };
+    // 标签栏功能
+    //   const tabOptions = [
+    //     { element: RefreshRender },
+    //     { element: TabOptionsRender },
+    //     { element: TabMaximizeRender }
+    //   ];
+    const tabOptions = [{
+        element: <RedoOutlined className={`icon ${rotating ? 'rotate' : ''}`} style={{ color: '#00000073', cursor: "pointer" }} onClick={() => {
+            dispatch(setRefreshKey("0"))
+            handleClick()
+            message.success('刷新成功')
+        }} />,
+    }]
+
+
+
     return (
-        <div className='tabsH pad16'>
-            <div>
-                <Tabs
-                    className="tabsTa"
-                    hideAdd
-                    activeKey={navs.showKey} //被选中
-                    style={{ height: 110 }}
-                    type="editable-card"
-                    onEdit={onEdit}
-                    onChange={onChange}
-                    items={
-                        navs.navsList.map((_) => {
-                            return {
-                                label: _.label,
-                                key: _.key,
-                                closable: _.closable,
-                                // disabled: i === 28,
-                            };
-                        })
-                    }
-                    renderTabBar={renderTabBar}
-                />
+        <div className='tabsH pad16 '>
+            <div className='flexSB h40' >
+                <div className='h40'>
+                    <Tabs
+                        className="tabsTa"
+                        hideAdd
+                        activeKey={navs.showKey} //被选中
+                        style={{ height: 110 }}
+                        type="editable-card"
+                        onEdit={onEdit}
+                        onChange={onChange}
+                        items={
+                            navs.navsList.map((_) => {
+                                return {
+                                    label: _.label,
+                                    key: _.key,
+                                    closable: _.closable,
+                                    // disabled: i === 28,
+                                };
+                            })
+                        }
+                        renderTabBar={renderTabBar}
+                    />
+                </div>
+                <div className='flex navRight'>
+                    {tabOptions.map((item, index) => {
+                        return (<div
+                            className='w37 h37 bl'
+                            key={index}>
+                            {item.element}
+                        </div>)
+                    })}
+                </div>
             </div>
-        </div>
+
+        </div >
     )
 }

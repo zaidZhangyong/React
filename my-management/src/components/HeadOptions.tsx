@@ -18,7 +18,7 @@ import type { MenuProps } from 'antd';
 import { setShowKey } from "@/store/reducer/navs"
 import { useSelector, useDispatch } from 'react-redux';
 export default function HeadOptions(props: { collapsed: boolean, setCollapsed: Function, jump: Function }) {
-    const dispatch=useDispatch()
+    const dispatch = useDispatch()
     const items: MenuProps['items'] = [
         {
             key: 'personalInformation',
@@ -81,7 +81,7 @@ export default function HeadOptions(props: { collapsed: boolean, setCollapsed: F
     };
     return (
         <div className='headBox'>
-            <div className='flexSB'>
+            <div className='flexSB bb h50'>
                 <Button
                     type="text"
                     icon={props.collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}

@@ -1,24 +1,13 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useRef } from 'react';
 import type { GetProp, TableProps } from 'antd';
 import { Table, Button, Flex, Form, Input, Select, } from 'antd';
 
 import { PlusOutlined } from '@ant-design/icons';
 import type { SorterResult } from 'antd/es/table/interface';
+import Add from "./add"
 type ColumnsType<T extends object = object> = TableProps<T>['columns'];
 type TablePaginationConfig = Exclude<GetProp<TableProps, 'pagination'>, boolean>;
-
-interface DataType {
-    name: {
-        first: string;
-        last: string;
-    };
-    gender: string;
-    email: string;
-    login: {
-        uuid: string;
-    };
-}
-
+import { ChildRef, FieldType, DataType } from "./type"
 interface TableParams {
     pagination?: TablePaginationConfig;
     sortField?: SorterResult<any>['field'];
@@ -26,45 +15,11 @@ interface TableParams {
     filters?: Parameters<GetProp<TableProps, 'onChange'>>[1];
 }
 
-const columns: ColumnsType<DataType> = [
-    {
-        title: '姓名',
-        dataIndex: 'name',
-        sorter: true,
-        render: (name) => `${name.first} ${name.last}`,
-        width: '20%',
-    },
-    {
-        title: '性别',
-        dataIndex: 'gender',
-        width: '20%',
-    },
-    {
-        title: '年龄',
-        dataIndex: 'age',
-        width: '10%',
-    },
-    {
-        title: 'Email',
-        dataIndex: 'email',
-    },
-    {
-        title: '操作',
-        dataIndex: 'email',
-        render: (_) => (
-            <Flex wrap gap="small">
-                <Button type="primary">编辑</Button>
-                <Button type="primary" danger>
-                    删除
-                </Button>
-            </Flex>
-        ),
-    },
-];
 
 
 export default function AccountManagement() {
     const [data, setData] = useState<DataType[]>();
+    const addBoxRef = useRef<ChildRef>(null);
     const [loading, setLoading] = useState(false);
     const [tableParams, setTableParams] = useState<TableParams>({
         pagination: {
@@ -72,6 +27,41 @@ export default function AccountManagement() {
             pageSize: 10,
         },
     });
+    const columns: ColumnsType<DataType> = [
+        {
+            title: '姓名',
+            dataIndex: 'name',
+            sorter: true,
+            render: (name) => `${name.first} ${name.last}`,
+            width: '20%',
+        },
+        {
+            title: '性别',
+            dataIndex: 'gender',
+            width: '20%',
+        },
+        {
+            title: '年龄',
+            dataIndex: 'age',
+            width: '10%',
+        },
+        {
+            title: 'Email',
+            dataIndex: 'email',
+        },
+        {
+            title: '操作',
+            dataIndex: 'email',
+            render: (_) => (
+                <Flex wrap gap="small">
+                    <Button type="primary" onClick={() => { addUser(2) }}>编辑</Button>
+                    <Button type="primary" danger>
+                        删除
+                    </Button>
+                </Flex>
+            ),
+        },
+    ];
 
     const fetchData = () => {
         setLoading(true);
@@ -115,17 +105,20 @@ export default function AccountManagement() {
             setData([]);
         }
     };
+    const addUser = (type: number, item?: FieldType) => {
+        addBoxRef?.current?.showModal(type, item)
 
+
+    }
     const [form] = Form.useForm();
     const handleChange = (value: string) => {
         console.log(`selected ${value}`);
     };
-
-
-
-
     return (
         <>
+            {/* 添加编辑 */}
+            <Add ref={addBoxRef} />
+
             <div className='flexSB'>
                 <div>
                     <Form
@@ -156,7 +149,7 @@ export default function AccountManagement() {
                     </Form>
                 </div>
                 <div>
-                    <Button type="primary" icon={<PlusOutlined style={{ color: 'white' }} />} >添加</Button>
+                    <Button type="primary" onClick={() => { addUser(1) }} icon={<PlusOutlined style={{ color: 'white' }} />} >添加</Button>
                 </div>
             </div>
             <div className='matop10'>

@@ -8,6 +8,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from "@/store"
 import { addNavs, setKeyPath, } from "@/store/reducer/navs"
 import React, { useEffect } from 'react';
+type AllIconsType = {
+    [key: string]: React.ComponentType;
+};
+const allIcons = AllIcons as unknown as AllIconsType;
 // keyof typeof AllIcons
 type RouterMenuItem = {
     icon?: string;
@@ -26,17 +30,20 @@ export default function LeftMenu(props: { jump: Function }) {
     const keyPath = useSelector((state: RootState) => state.navs.keyPath);
     const MenuList = Router.filter(item => item.title === 'layout')[0]?.children || [];
     function Menuitems(menuList: RouterMenuItem[]): MenuItem[] {
-        return menuList.map(item => {
-            if (item?.show != false) {
-                return ({
-                    key: item.children ? item.key : item.path,
-                    label: item.title,
-                    path: item.path,
-                    icon: item.icon ? createElement(AllIcons[item.icon] as React.ComponentType) : undefined,
-                    children: item.children ? Menuitems(item.children) : null,
-                })
-            }
-        });
+        return menuList
+            .filter(item => item?.show !== false)  // 过滤出需要的项
+            .map(item => {
+                if (item?.show != false) {
+                    return ({
+                        key: item.children ? item.key : item.path ?? '',
+                        label: item.title ?? '',
+                        path: item.path ?? '',
+                        icon: item.icon ? createElement(allIcons[item.icon] as React.ComponentType) : undefined,
+                        children: item.children ? Menuitems(item.children) : null,
+                    })
+                }
+
+            })
     }
     const toggleCollapsed: MenuProps['onClick'] = (e) => {
         e.domEvent.preventDefault();

@@ -15,8 +15,6 @@ interface TableParams {
     filters?: Parameters<GetProp<TableProps, 'onChange'>>[1];
 }
 
-
-
 export default function AccountManagement() {
     const [data, setData] = useState<DataType[]>();
     const addBoxRef = useRef<ChildRef>(null);

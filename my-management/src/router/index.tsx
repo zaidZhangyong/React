@@ -6,6 +6,7 @@ const Error404 = lazy(() => import("@/views/404")) //使用懒加载
 const AccountManagement = lazy(() => import("@/views/Admin/AccountManagement")) //使用懒加载
 const Carouselimage = lazy(() => import("@/views/Admin/Carouselimage")) //使用懒加载
 const Home = lazy(() => import("@/views/Admin/Home")) //使用懒加载
+const DataAnalysis = lazy(() => import("@/views/Admin/DataAnalysis")) //使用懒加载
 const PersonalInformation = lazy(() => import("@/views/Admin/PersonalInformation")) //使用懒加载
 const ChangePassword = lazy(() => import("@/views/Admin/ChangePassword")) //使用懒加载
 import { Navigate } from "react-router-dom"
@@ -29,6 +30,13 @@ const routes = [
                 path: '/home',
                 key: "home",
                 element: <Home />,
+            },
+            {
+                title: "数据分析",
+                icon: "FundOutlined",
+                path: '/dataAnalysis',
+                key: "dataAnalysis",
+                element: <DataAnalysis />,
             },
 
             {

@@ -11,7 +11,7 @@ import {
 
 } from '@ant-design/icons';
 import '@/assets/styles/global.scss';
-import icon from "@/assets/images/icon2.png"
+import icon from "@/assets/images/icon2.png";
 import TabsBox from "./TabsBox.tsx"
 import { Button, Dropdown, Modal } from 'antd';
 import type { MenuProps } from 'antd';

@@ -18,33 +18,40 @@ type RouterMenuItem = {
     title: string;
     path?: string;
     key?: string;
-    show?: boolean; // 该菜单是否需要显示
+    show?: boolean;// 该菜单是否需要显示
+    selectShow?: boolean, // 该菜单下拉是否需要显示
     children?: RouterMenuItem[];
 }
 type MenuItem = Required<MenuProps>['items'][number];
-export default function LeftMenu(props: { jump: Function }) {
-
-
+export default function LeftMenu() {
     const dispatch = useDispatch();
     const location = useLocation(); //获取当前路由
     const keyPath = useSelector((state: RootState) => state.navs.keyPath);
     const MenuList = Router.filter(item => item.title === 'layout')[0]?.children || [];
     function Menuitems(menuList: RouterMenuItem[]): MenuItem[] {
         return menuList
-            .filter(item => item?.show !== false)  // 过滤出需要的项
+            .filter(item => item?.show !== false) // 过滤出需要的项
             .map(item => {
                 if (item?.show != false) {
-                    return ({
-                        key: item.children ? item.key : item.path ?? '',
+
+                    const menuItem: MenuItem = {
+                        key: item.children && item.selectShow !== false ? item.key : item.path ?? '',
                         label: item.title ?? '',
                         path: item.path ?? '',
-                        icon: item.icon ? createElement(allIcons[item.icon] as React.ComponentType) : undefined,
-                        children: item.children ? Menuitems(item.children) : null,
-                    })
-                }
+                        icon: item.icon ? createElement(allIcons[item.icon] as React.ComponentType) : null,
+                    } as MenuItem;
+                    // 只有当children不为空数组时，才添加children属性
+                    if (item.children && item.selectShow !== false) {
+                        menuItem.children = Menuitems(item.children);
+                    }
+                    return menuItem;
 
-            })
+
+                }
+                return undefined;
+            }).filter(item => item !== undefined) as MenuItem[];
     }
+    console.log(Menuitems(MenuList))
     const toggleCollapsed: MenuProps['onClick'] = (e) => {
         e.domEvent.preventDefault();
         if (e.key !== location.pathname) {

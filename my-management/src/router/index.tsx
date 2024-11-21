@@ -47,13 +47,16 @@ const routes = [
                 path: '/chat',
                 key: "chat",
                 element: <Chat />,
+                selectShow: false,
                 children: [
                     {
+                        show: false, //不在侧边栏展示
                         path: '/chat/chatList',
                         title: "成员列表",
                         element: <ChatList />,
                     },
                     {
+                        show: false, //不在侧边栏展示
                         path: '/chat/addUser',
                         title: "添加",
                         element: <AddUser />,

@@ -23,7 +23,11 @@ const rootReducer = combineReducers({
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const store = configureStore({
-    reducer: persistedReducer // 使用持久化后的 reducer
+    reducer: persistedReducer,// 使用持久化后的 reducer
+    middleware:getDefaultMiddleware => getDefaultMiddleware({
+        //关闭redux序列化检测
+        serializableCheck:false
+    }) 
 });
 
 export const persistor = persistStore(store);

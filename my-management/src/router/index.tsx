@@ -9,7 +9,9 @@ const Home = lazy(() => import("@/views/Admin/Home")) //使用懒加载
 const DataAnalysis = lazy(() => import("@/views/Admin/DataAnalysis")) //使用懒加载
 const PersonalInformation = lazy(() => import("@/views/Admin/PersonalInformation")) //使用懒加载
 const ChangePassword = lazy(() => import("@/views/Admin/ChangePassword")) //使用懒加载
-const Chat=lazy(() => import("@/views/Admin/Chat"))
+const Chat = lazy(() => import("@/views/Admin/Chat"))
+const ChatList = lazy(() => import("@/views/Admin/Chat/chatList"))
+const AddUser = lazy(() => import("@/views/Admin/Chat/addUser"))
 import { Navigate } from "react-router-dom"
 const routes = [
     {
@@ -45,6 +47,18 @@ const routes = [
                 path: '/chat',
                 key: "chat",
                 element: <Chat />,
+                children: [
+                    {
+                        path: '/chat/chatList',
+                        title: "成员列表",
+                        element: <ChatList />,
+                    },
+                    {
+                        path: '/chat/addUser',
+                        title: "添加",
+                        element: <AddUser />,
+                    }
+                ],
             },
             {
                 title: "图片管理",

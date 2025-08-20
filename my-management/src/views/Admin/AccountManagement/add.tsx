@@ -5,7 +5,7 @@ import { ChildRef, FieldType } from "./type"
 const Add = forwardRef<ChildRef>((props, ref) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [typeIndex, setTypeIndex] = useState(1); //1新增 2 编辑
-    const [itemData, setItemData] = useState<FieldType>();
+    // const [itemData, setItemData] = useState<FieldType>();
 
     const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
         console.log('Success:', values);
@@ -15,10 +15,10 @@ const Add = forwardRef<ChildRef>((props, ref) => {
 
     //  ref使用 forwardRef 配合 定义暴露给父组件的方法
     useImperativeHandle(ref, () => ({
-        showModal(type, item) {
+        showModal(type) {
             setIsModalOpen(true);
             setTypeIndex(type);
-            setItemData(item);
+            // setItemData(item);
         }
     }));
     // const showModal = () => {

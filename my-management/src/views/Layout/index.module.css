@@ -5,26 +5,30 @@
   border-radius: 6px;
 }
 
-.page {
-  position: absolute;
-  inset: 0;
-}
-
-.page-enter {
+.fade-enter,
+.fade-appear {
   opacity: 0;
-  transform: translateX(100%);
 }
 
-.page-enter-active {
+.fade-enter-active,
+.fade-appear-active {
   opacity: 1;
-  transition: opacity 500ms;
+  transition: opacity 1s ease-in;
 }
 
-.page-exit {
+.fade-enter-done {
   opacity: 1;
 }
 
-.page-exit-active {
+.fade-exit {
+  opacity: 1;
+}
+
+.fade-exit-active {
   opacity: 0;
-  transition: opacity 500ms;
+  transition: opacity 1s ease-in;
+}
+
+.fade-exit-done {
+  opacity: 0;
 }

@@ -56,7 +56,7 @@ export default function AccountManagement() {
     },
     {
       title: "操作",
-      dataIndex: "email",
+      dataIndex: "",
       align: "center",
       render: () => (
         <Flex

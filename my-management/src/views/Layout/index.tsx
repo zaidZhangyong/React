@@ -12,6 +12,7 @@ const App: React.FC = () => {
   const refreshKey = useSelector((state: RootState) => state.navs.refreshKey);
 
   // const navsList = useSelector((state: RootState) => state.navs.navsList);
+  // const nodeRef = useRef(null);
   const navigate = useNavigate();
   const {
     token: { colorBgContainer, borderRadiusLG },
@@ -50,12 +51,12 @@ const App: React.FC = () => {
               key={location.pathname} // 路由变化即重新挂载
               nodeRef={nodeRef}
               timeout={500}
-              classNames="page" // 对应下方 CSS
+              classNames="fade" // 对应下方 CSS
               unmountOnExit
               appear
             >
               <div ref={nodeRef} style={{ height: "100%" }}>
-                
+               
               </div>
             </CSSTransition>
           </SwitchTransition> */}

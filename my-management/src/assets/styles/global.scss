@@ -93,6 +93,22 @@
         transform: rotate(360deg);
     }
 }
-.matop10{
+
+.matop10 {
     margin-top: 10px;
+}
+
+.ant-upload {
+    width: 250px;
+    height: 170px;
+}
+
+.ant-upload-select {
+    width: 250px !important;
+    height: 170px !important;
+}
+
+.form-button {
+    display: flex;
+    justify-content: flex-end;
 }

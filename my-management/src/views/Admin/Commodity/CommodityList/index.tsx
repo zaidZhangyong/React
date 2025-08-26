@@ -1,13 +1,15 @@
-import { Table, Flex, Button, TableColumnsType } from "antd";
+import { Table, Flex, Button, TableColumnsType, Form, Input } from "antd";
 import icon from "@/assets/images/icon2.png";
 import { Image } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
+import { useState } from "react";
+import Add from "./add";
 // import { useRef } from "react";
 // import DeleteModal, { DeleteProps } from "@/components/DeleteModal";
 const CommodityList = () => {
   // const addBoxRef = useRef<ChildRef>(null);
   // const deleteBoxRef = useRef<DeleteProps>(null);
-
+  const [form] = Form.useForm();
   const columns: TableColumnsType = [
     {
       title: "图片",
@@ -93,23 +95,53 @@ const CommodityList = () => {
   // const deleteItem = () => {
   //   // deleteBoxRef.current?.close();
   // };
+  const [loading, setLoadings] = useState<boolean>(false);
+  const [typeIndex, setTypeIndex] = useState(true); //true新增 false编辑
+  const query = () => {
+    setLoadings(true);
+  };
+  const onReset = () => {
+    setLoadings(false);
+    form.resetFields();
+  };
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const open = (type: boolean) => {
+    setIsModalOpen(type);
+    setTypeIndex(true);
+  };
+
   return (
     <>
-      {/* <Add ref={addBoxRef} /> */}
+      <Add isModalOpen={isModalOpen} open={open} typeIndex={typeIndex} />
       {/* <DeleteModal ref={deleteBoxRef} deleteItem={deleteItem} /> */}
+      <div className="FormInline">
+        <Form layout="inline" form={form} initialValues={{ layout: "inline" }}>
+          <Form.Item label="">
+            <Input size="large" placeholder="请输入商品名称" />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" onClick={() => query()}>
+              Submit
+            </Button>
+            <Button type="primary" onClick={() => onReset()}>
+              Reset
+            </Button>
+          </Form.Item>
+        </Form>
+      </div>
       <div style={{ margin: "10px 0" }}>
         <Button
           icon={<PlusOutlined />}
           type="primary"
           onClick={() => {
-            // setUser("add");
+            open(true);
           }}
         >
           新增
         </Button>
         {/* <Add ref={addBoxRef} /> */}
       </div>
-      <Table columns={columns} dataSource={data} />
+      <Table loading={loading} columns={columns} dataSource={data} />
     </>
   );
 };

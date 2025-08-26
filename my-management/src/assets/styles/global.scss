@@ -112,3 +112,19 @@
     display: flex;
     justify-content: flex-end;
 }
+
+.FormInline {
+    margin-bottom: 15px;
+
+    .ant-form {
+        display: flex;
+        align-items: center;
+    }
+
+    .ant-input {
+        width: 250px;
+    }
+    .ant-btn{
+        margin-right: 10px;
+    }
+}

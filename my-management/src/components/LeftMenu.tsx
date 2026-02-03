@@ -24,8 +24,16 @@ type RouterMenuItem = {
 }
 type MenuItem = Required<MenuProps>['items'][number];
 export default function LeftMenu() {
+    const setUpNav = ["chat"]
     const dispatch = useDispatch();
     const location = useLocation(); //获取当前路由
+    let pathname = location.pathname
+    for (let i in setUpNav) {
+        if (setUpNav[i] == pathname.split("/")[1]) {
+            pathname = "/" + pathname.split("/")[1]
+        }
+    }
+
     const keyPath = useSelector((state: RootState) => state.navs.keyPath);
     const MenuList = Router.filter(item => item.title === 'layout')[0]?.children || [];
     function Menuitems(menuList: RouterMenuItem[]): MenuItem[] {
@@ -51,9 +59,9 @@ export default function LeftMenu() {
                 return undefined;
             }).filter(item => item !== undefined) as MenuItem[];
     }
-    console.log(Menuitems(MenuList))
     const toggleCollapsed: MenuProps['onClick'] = (e) => {
         e.domEvent.preventDefault();
+        console.log(e.key, location.pathname)
         if (e.key !== location.pathname) {
             dispatch(addNavs({ label: e.domEvent.currentTarget.innerText, key: e.key, keyPath: e.keyPath.slice(1) }))
             //存储选中的菜单
@@ -68,13 +76,12 @@ export default function LeftMenu() {
     };
     return (
         <div>
-            <span></span>
             <Menu
                 mode="inline"
                 theme="dark"
                 style={{ height: '100%' }}
                 onClick={toggleCollapsed}
-                selectedKeys={[location.pathname]}
+                selectedKeys={[pathname]}
                 openKeys={keyPath}
                 onOpenChange={onOpenChange}
                 items={Menuitems(MenuList)}

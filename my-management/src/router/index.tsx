@@ -1,6 +1,7 @@
-import { lazy } from "react"; //lazy 懒加载 需要嵌套React.Suspense
-import Login from "@/views/Login";
 import Layout from "@/views/Layout";
+import Login from "@/views/Login";
+import { lazy } from "react"; //lazy 懒加载 需要嵌套React.Suspense
+import { Navigate } from "react-router-dom";
 // eslint-disable-next-line react-refresh/only-export-components
 const About = lazy(() => import("@/views/About")); //使用懒加载
 const Error404 = lazy(() => import("@/views/404")); //使用懒加载
@@ -20,7 +21,9 @@ const AddUser = lazy(() => import("@/views/Admin/Chat/addUser"));
 const CommodityList = lazy(
   () => import("@/views/Admin/Commodity/CommodityList")
 );
-import { Navigate } from "react-router-dom";
+const ProductType = lazy(
+  () => import("@/views/Admin/Commodity/ProductType")
+);
 const routes = [
   {
     path: "/",
@@ -60,6 +63,11 @@ const routes = [
             path: "/CommodityList",
             title: "商品列表",
             element: <CommodityList />,
+          },
+          {
+            path: "/ProductType",
+            title: "类型管理",
+            element: <ProductType />,
           },
         ],
       },

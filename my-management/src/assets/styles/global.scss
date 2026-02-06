@@ -112,39 +112,41 @@
   width: auto !important;
 }
 
-
 .matop10 {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 
 .ant-upload {
-    width: 250px;
-    height: 170px;
+  width: 250px;
+  height: 170px;
 }
 
 .ant-upload-select {
-    width: 250px !important;
-    height: 170px !important;
+  width: 250px !important;
+  height: 170px !important;
 }
 
 .form-button {
-    display: flex;
-    justify-content: flex-end;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .FormInline {
-    margin-bottom: 15px;
+  margin-bottom: 15px;
 
-    .ant-form {
-        display: flex;
-        align-items: center;
-    }
+  .ant-form {
+    display: flex;
+    align-items: center;
+  }
 
-    .ant-input {
-        width: 250px;
-    }
-    .ant-btn{
-        margin-right: 10px;
-    }
+  .ant-input {
+    width: 250px;
+  }
+  .ant-btn {
+    margin-right: 10px;
+  }
 }
 
+.ant-table-cell {
+  text-align: center;
+}

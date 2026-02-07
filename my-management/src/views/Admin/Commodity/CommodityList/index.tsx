@@ -1,7 +1,6 @@
-import { Table, Flex, Button, TableColumnsType, Form, Input } from "antd";
 import icon from "@/assets/images/icon2.png";
-import { Image } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
+import { Button, Flex, Form, Image, Input, Select, Table, TableColumnsType } from "antd";
 import { useState } from "react";
 import Add from "./add";
 // import { useRef } from "react";
@@ -11,6 +10,13 @@ const CommodityList = () => {
   // const deleteBoxRef = useRef<DeleteProps>(null);
   const [form] = Form.useForm();
   const columns: TableColumnsType = [
+    {
+      title: "id",
+      dataIndex: "id",
+      key: "id",
+      align: "center",
+
+    },
     {
       title: "图片",
       dataIndex: "picture",
@@ -61,6 +67,9 @@ const CommodityList = () => {
           align="center" // 垂直居中
           style={{ height: "100%" }}
         >
+          <Button type="primary" onClick={() => showModal()}>
+            修改
+          </Button>
           <Button type="primary" danger onClick={() => showModal()}>
             删除
           </Button>
@@ -71,22 +80,11 @@ const CommodityList = () => {
 
   const data = [
     {
-      key: "1",
-      picture: "John Brown",
-      date: "2015.6.1",
+      id: '1',
     },
-    {
-      key: "2",
-      picture: "John Brown",
-      date: "2015.6.1",
-    },
-    {
-      key: "3",
-      picture: "John Brown",
-      date: "2015.6.1",
-    },
+
   ];
-  const showModal = () => {};
+  const showModal = () => { };
   // deleteBoxRef.current?.showModal("确认删除当前图片！！");
   // };
   // const setUser = (type: string) => {
@@ -117,7 +115,10 @@ const CommodityList = () => {
       <div className="FormInline">
         <Form layout="inline" form={form} initialValues={{ layout: "inline" }}>
           <Form.Item label="">
-            <Input size="large" placeholder="请输入商品名称" />
+            <Input placeholder="请输入商品名称" />
+          </Form.Item>
+          <Form.Item label="类型">
+            <Select style={{ width: "200px" }} placeholder="请选择类型" options={[{ label: '女装', value: 'demo' }]} />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit" onClick={() => query()}>
@@ -139,6 +140,7 @@ const CommodityList = () => {
         >
           新增
         </Button>
+
         {/* <Add ref={addBoxRef} /> */}
       </div>
       <Table loading={loading} columns={columns} dataSource={data} />

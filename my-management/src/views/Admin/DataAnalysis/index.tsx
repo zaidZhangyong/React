@@ -1,13 +1,14 @@
-import EChart from '../../../components/ECharts';
 import { EChartsOption } from 'echarts';
+import EChart from '../../../components/ECharts';
 export default function DataAnalysis() {
     const chartOption1: EChartsOption = {
         title: {
-            text: 'ECharts Example'
+            text: '销售数量',
+            left: 'center'
         },
         tooltip: {},
         xAxis: {
-            data: ['A', 'B', 'C', 'D', 'E']
+            data: ['女装', '男装', '鞋', '数码', '电子']
         },
         yAxis: {},
         series: [
@@ -19,7 +20,7 @@ export default function DataAnalysis() {
     };
     const chartOption2: EChartsOption = {
         title: {
-            text: 'Referer of a Website',
+            text: '数据占比',
             subtext: 'Fake Data',
             left: 'center'
         },
@@ -36,11 +37,11 @@ export default function DataAnalysis() {
                 type: 'pie',
                 radius: '50%',
                 data: [
-                    { value: 1048, name: 'Search Engine' },
-                    { value: 735, name: 'Direct' },
-                    { value: 580, name: 'Email' },
-                    { value: 484, name: 'Union Ads' },
-                    { value: 300, name: 'Video Ads' }
+                    { value: 1048, name: '女装' },
+                    { value: 735, name: '男装' },
+                    { value: 580, name: '鞋' },
+                    { value: 484, name: '数码' },
+                    { value: 300, name: '电子' }
                 ],
                 emphasis: {
                     itemStyle: {
@@ -55,8 +56,8 @@ export default function DataAnalysis() {
     return (
         <>
             <div>数据分析</div>
-            <EChart option={chartOption1} height='300px' width='500px' />
-            <EChart option={chartOption2} height='300px' width='500px' />
+            <EChart option={chartOption1} height='400px' width='100%' />
+            <EChart option={chartOption2} height='300px' width='100%'  />
         </>
 
     )

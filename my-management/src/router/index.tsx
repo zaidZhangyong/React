@@ -6,6 +6,7 @@ import { Navigate } from "react-router-dom";
 const About = lazy(() => import("@/views/About")); //使用懒加载
 const Error404 = lazy(() => import("@/views/404")); //使用懒加载
 const AccountManagement = lazy(() => import("@/views/Admin/AccountManagement")); //使用懒加载
+const Management = lazy(() => import("@/views/Admin/Manager")); //使用懒加载
 const Carouselimage = lazy(
   () => import("@/views/Admin/PictureOutlined/Carouselimage")
 ); //使用懒加载
@@ -45,13 +46,7 @@ const routes = [
         key: "home",
         element: <Home />,
       },
-      {
-        title: "数据分析",
-        icon: "FundOutlined",
-        path: "/dataAnalysis",
-        key: "dataAnalysis",
-        element: <DataAnalysis />,
-      },
+
       {
         title: "商品",
         icon: "ShopOutlined",
@@ -110,8 +105,15 @@ const routes = [
         title: "账号管理",
         icon: "UserOutlined",
         path: "/accountManagement",
-        key: "UserOutlined",
+        key: "accountManagement",
         element: <AccountManagement />,
+      },
+      {
+        title: "管理员",
+        icon: "UserOutlined",
+        path: "/Manager",
+        key: "Manager",
+        element: <Management />,
       },
       {
         show: false, //不在侧边栏展示
@@ -124,6 +126,13 @@ const routes = [
         title: "修改密码",
         path: "/changePassword",
         element: <ChangePassword />,
+      },
+      {
+        title: "数据分析",
+        icon: "FundOutlined",
+        path: "/dataAnalysis",
+        key: "dataAnalysis",
+        element: <DataAnalysis />,
       },
     ],
   },

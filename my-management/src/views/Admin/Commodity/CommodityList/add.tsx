@@ -1,9 +1,24 @@
-import ModalBox from "@/components/ModalBox";
+
+// 文件顶部声明（解决 TS 报错）
+
 import UpImg from "@/components/UpImg";
-import { PlusOutlined } from "@ant-design/icons";
+import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import type { FormProps } from "antd";
-import { Button, Form, Input, Modal } from "antd";
+import { Button, Flex, Form, Input, Modal, Tag } from "antd";
+import BlotFormatter from 'quill-blot-formatter';
 import { useState } from "react";
+import ReactQuill, { Quill } from "react-quill";
+import 'react-quill/dist/quill.snow.css';
+declare module 'react-quill' {
+  export interface Quill {
+    import: (name: string) => any;
+    register: (path: string, def: any) => void;
+  }
+}
+
+
+Quill.register('modules/blotFormatter', BlotFormatter);
+
 interface AddProps {
   isModalOpen: boolean;
   open: (visible: boolean) => void; // 控制弹窗显隐的回调
@@ -16,13 +31,20 @@ type FieldType = {
   remember?: string;
 };
 
+
+
 const Add: React.FC<AddProps> = ({ isModalOpen, open, typeIndex }) => {
+
+
+  // 定义类型
+
   const [form] = Form.useForm(); // 创建 form 实例
   const [openAdd, setopenAdd] = useState<boolean>(false);
+  const [value, setValue] = useState('');
 
   const handleOk = () => {
     // form.submit();
-      setopenAdd(false);
+    setopenAdd(false);
     // setopenAdd(false);
   }
   const handleCancel = () => {
@@ -37,18 +59,44 @@ const Add: React.FC<AddProps> = ({ isModalOpen, open, typeIndex }) => {
   ) => {
     console.log("Failed:", errorInfo);
   };
+
+  // 工具栏配置
+  const modules = {
+    toolbar: [
+      [{ header: [1, 2, 3, false] }],
+      ['bold', 'italic', 'underline'],
+      ['image', 'video'],
+    ],
+    blotFormatter: {},
+  };
+
+
+
+  const handleChange = (content: string) => {
+    console.log(content)
+    // onChange?.(content);
+  };
   return (
     <>
-      <ModalBox
+      <Modal
+        title="添加商品"
         open={isModalOpen}
-        typeIndex={typeIndex}
+        // typeIndex={typeIndex}
         onCancel={() => open(false)}
+        width={1000}
+        styles={{
+          body: {
+            maxHeight: '60vh',  // 限制最大高度
+            overflow: 'auto',    // 内容超出时滚动
+            padding: '24px',
+          },
+        }}
       >
         <Form
           name="basic"
-          labelCol={{ span: 6 }}
+          labelCol={{ span: 5 }}
           wrapperCol={{ span: 16 }}
-          style={{ maxWidth: 600 }}
+          style={{ maxWidth: 1000 }}
           initialValues={{ remember: true }}
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
@@ -92,33 +140,44 @@ const Add: React.FC<AddProps> = ({ isModalOpen, open, typeIndex }) => {
             rules={[{ required: true, message: "Please input your password!" }]}
           >
 
-            <div></div>
+            <div className="itemBox" style={{ marginBottom: "10px" }}>
+              <div style={{ marginBottom: "10px" }}>
+                <div className="flexSB">
+                  <div>尺寸</div>
+                  <Button shape="circle" size="small" danger icon={<MinusOutlined />}>
 
-            {/* <Form
-              name="basic"
-              labelCol={{ span: 6 }}
-              wrapperCol={{ span: 16 }}
-              style={{ maxWidth: 600 }}
-              initialValues={{ remember: true }}
-              onFinish={onFinish}
-              onFinishFailed={onFinishFailed}
-              autoComplete="off"
-            >
-              <Form.Item
-                label="名称"
-                name="password"
-                rules={[{ required: true, message: "Please input name!" }]}
-              >
-                <Input />
-              </Form.Item>
-              <Form.Item
-                label="选项内容"
-                name="password"
-                rules={[{ required: true, message: "Please input name!" }]}
-              >
-                <Input />
-              </Form.Item>
-            </Form> */}
+                  </Button>
+                </div>
+
+
+              </div>
+              <div style={{ marginTop: "5px", }}>
+                <Flex gap="small" align="center" wrap>
+                  <Tag>Tag 1</Tag>
+                  <Tag>Tag 1</Tag><Tag>Tag 1</Tag><Tag>Tag 1</Tag>
+                </Flex>
+              </div>
+            </div>
+            <div className="itemBox" style={{ marginBottom: "10px" }}>
+              <div style={{ marginBottom: "10px" }}>
+                <div className="flexSB">
+                  <div>尺寸</div>
+                  <Button shape="circle" size="small" danger icon={<MinusOutlined />}>
+
+                  </Button>
+                </div>
+
+
+              </div>
+              <div style={{ marginTop: "5px" }}>
+                <Flex gap="small" align="center" wrap>
+                  <Tag>Tag 1</Tag>
+                  <Tag>Tag 1</Tag><Tag>Tag 1</Tag><Tag>Tag 1</Tag>
+                </Flex>
+              </div>
+            </div>
+
+
 
 
             <Button
@@ -131,14 +190,25 @@ const Add: React.FC<AddProps> = ({ isModalOpen, open, typeIndex }) => {
             </Button>
           </Form.Item>
 
+          <Form.Item<FieldType>
+            label="详情"
+            name="password"
+            rules={[{ required: true, message: "Please input your password!" }]}
+          >
+            {/* <Input /> */}
+            <ReactQuill
 
-          <Form.Item label={null} className="form-button">
-            <Button type="primary" htmlType="submit">
-              Submit
-            </Button>
+              theme="snow"
+         
+              modules={modules}
+           
+              // placeholder={placeholder}
+              style={{ height: "400px" }}
+            />
           </Form.Item>
+
         </Form>
-      </ModalBox>
+      </Modal>
 
 
       <Modal

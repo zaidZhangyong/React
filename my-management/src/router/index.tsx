@@ -16,6 +16,7 @@ const PersonalInformation = lazy(
   () => import("@/views/Admin/PersonalInformation")
 ); //使用懒加载
 const ChangePassword = lazy(() => import("@/views/Admin/ChangePassword")); //使用懒加载
+const BrandLabel = lazy(() => import("@/views/Admin/Commodity/BrandLabel")); //使用懒加载
 const Chat = lazy(() => import("@/views/Admin/Chat"));
 const ChatList = lazy(() => import("@/views/Admin/Chat/chatList"));
 const AddUser = lazy(() => import("@/views/Admin/Chat/addUser"));
@@ -64,43 +65,36 @@ const routes = [
             title: "类型管理",
             element: <ProductType />,
           },
-        ],
-      },
-      {
-        title: "聊天",
-        icon: "WechatOutlined",
-        path: "/chat",
-        key: "chat",
-        element: <Chat />,
-        selectShow: false,
-        children: [
           {
-            show: false, //不在侧边栏展示
-            path: "/chat/chatList",
-            title: "成员列表",
-            element: <ChatList />,
-          },
-          {
-            show: false, //不在侧边栏展示
-            path: "/chat/addUser",
-            title: "添加",
-            element: <AddUser />,
+            path: "/BrandLabel",
+            title: "标签管理",
+            element: <BrandLabel />,
           },
         ],
       },
-      {
-        title: "图片管理",
-        icon: "PictureOutlined",
-        path: "/",
-        key: "picture",
-        children: [
-          {
-            path: "/carouselimage",
-            title: "轮播图管理",
-            element: <Carouselimage />,
-          },
-        ],
-      },
+      // {
+      //   title: "聊天",
+      //   icon: "WechatOutlined",
+      //   path: "/chat",
+      //   key: "chat",
+      //   element: <Chat />,
+      //   selectShow: false,
+      //   children: [
+      //     {
+      //       show: false, //不在侧边栏展示
+      //       path: "/chat/chatList",
+      //       title: "成员列表",
+      //       element: <ChatList />,
+      //     },
+      //     {
+      //       show: false, //不在侧边栏展示
+      //       path: "/chat/addUser",
+      //       title: "添加",
+      //       element: <AddUser />,
+      //     },
+      //   ],
+      // },
+
       {
         title: "账号管理",
         icon: "UserOutlined",
@@ -114,6 +108,26 @@ const routes = [
         path: "/Manager",
         key: "Manager",
         element: <Management />,
+      },
+      {
+        title: "订单管理",
+        icon: "UserOutlined",
+        path: "/Order",
+        key: "Order",
+        element: <Management />,
+      },
+      {
+        title: "图片管理",
+        icon: "PictureOutlined",
+        path: "/",
+        key: "picture",
+        children: [
+          {
+            path: "/carouselimage",
+            title: "轮播图管理",
+            element: <Carouselimage />,
+          },
+        ],
       },
       {
         show: false, //不在侧边栏展示

@@ -1,11 +1,12 @@
 import { add, deleteItem, getList } from '@/api/swiper';
 import { LoadingOutlined, PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
-import { Button, Flex, Image, message, Modal, Popconfirm, Upload, UploadProps } from 'antd';
+import { Button, Image, message, Modal, Popconfirm, Upload, UploadProps } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
 import { useEffect, useState } from 'react';
 export default function Carouselimage() {
-  const [data, setData] = useState<[]>();
+  const [dataList, setDataList] = useState<[]>();
   const [loading, setLoading] = useState<boolean>(false);
+  const [loading1, setLoading1] = useState<boolean>(false);
   const [imageUrl, setImageUrl] = useState<string>();
   useEffect(() => {
 
@@ -44,19 +45,14 @@ export default function Carouselimage() {
       dataIndex: '',
       align: 'center',
       render: (_: any, record: any) => (
-        <Flex wrap gap="small">
-          {/* <Button type="primary" onClick={() => deleteBut(record)} danger>
-                        删除
-                    </Button> */}
-          <Popconfirm
-            title="删除"
-            description="确定删除当前图片吗？"
-            icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
-            onConfirm={() => deleteBut(record)}
-          >
-            <Button danger>删除</Button>
-          </Popconfirm>
-        </Flex>
+        <Popconfirm
+          title="删除"
+          description="确定删除当前图片吗？"
+          icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+          onConfirm={() => deleteBut(record)}
+        >
+          <Button danger>删除</Button>
+        </Popconfirm>
       ),
     },
   ];
@@ -69,12 +65,13 @@ export default function Carouselimage() {
   const handleOk = () => {
 
     add({ url: imageUrl }).then(res => {
+      console.log(res)
       message.open({
-        type: res.data.code == 200 ? 'success' : 'error',
-        content: res.data.message,
+        type: res.code == 200 ? 'success' : 'error',
+        content: res.message,
       });
       setIsModalOpen(false);
-      if (res.data.code == 200) {
+      if (res.code == 200) {
         setImageUrl("")
         getData()
       }
@@ -84,21 +81,18 @@ export default function Carouselimage() {
   const deleteBut = (item: any) => {
     deleteItem({ id: item.id }).then(res => {
       message.open({
-        type: res.data.code == 200 ? 'success' : 'error',
-        content: res.data.message,
+        type: res.code == 200 ? 'success' : 'error',
+        content: res.message,
       });
-      if (res.data.code == 200) {
+      if (res.code == 200) {
         getData()
       }
     })
 
   }
   const getData = () => {
-    console.log("123")
     getList().then(res => {
-      console.log(res.data.data)
-      setData(res.data.data)
-      // console.log(data)
+      setDataList(res.data)
     })
 
   }
@@ -109,7 +103,7 @@ export default function Carouselimage() {
 
   const handleChange: UploadProps['onChange'] = (info) => {
     if (info.file.status === 'uploading') {
-      setLoading(true);
+      setLoading1(true);
       return;
     }
     if (info.file.status === 'done') {
@@ -117,10 +111,10 @@ export default function Carouselimage() {
       // console.log(info.file.response.data);
 
       if (info.file.response.data) {
-        setLoading(false);
+        setLoading1(false);
         setImageUrl(info.file.response.data);
       } else {
-        setLoading(false);
+        setLoading1(false);
         message.error('获取文件失败');
       }
     }
@@ -138,7 +132,7 @@ export default function Carouselimage() {
   };
   const uploadButton = (
     <button style={{ border: 0, background: 'none' }} type="button">
-      {loading ? <LoadingOutlined /> : <PlusOutlined />}
+      {loading1 ? <LoadingOutlined /> : <PlusOutlined />}
       <div style={{ marginTop: 8 }}>Upload</div>
     </button>
   );
@@ -176,7 +170,7 @@ export default function Carouselimage() {
       <div className='matop10'>
         <Table
           columns={columns}
-          dataSource={data}
+          dataSource={dataList}
           rowKey="id"
           loading={loading}
         /></div>

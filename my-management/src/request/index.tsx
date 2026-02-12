@@ -5,7 +5,7 @@ import axios, { AxiosRequestConfig } from "axios";
 //基础URL，axios将会自动拼接在url前
 //process.env.NODE_ENV 判断是否为开发环境 根据不同环境使用不同的baseURL 方便调试
 const baseURL =
-  process.env.NODE_ENV === "development" ? "" : "https://your.domain.com/api";
+  process.env.NODE_ENV === "development" ? "/api/" : "https://your.domain.com/api";
 
 
 // //默认请求超时时间
@@ -56,7 +56,7 @@ interface axiosTypes {
 interface responseTypes {
   data: any;
   code: number;
-  msg: string;
+  message: string;
   result: unknown;
 }
 
@@ -97,7 +97,7 @@ const requestHandler = (
             console.log("登录异常，执行登出...");
           }
           const e = JSON.stringify(data);
-          message.warning(`请求错误：${e}`);
+          message.warning(`请求错误：${JSON.parse(e).message}`);
           console.log(`请求错误：${e}`);
           //数据请求错误 使用reject将错误返回
           reject(data);

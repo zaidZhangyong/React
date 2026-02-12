@@ -1,7 +1,7 @@
-import { deleteItem } from '@/api/swiper';
+import { addType, deleteItem, getList, typeSort } from '@/api/merchandise';
 import { PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea/dnd'; // 或 'react-beautiful-dnd'
-import { Button, Flex, Form, FormProps, Input, message, Modal, Popconfirm } from 'antd';
+import { Button, Form, FormProps, Input, message, Modal, Popconfirm } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
 import { useEffect, useState } from 'react';
 
@@ -10,13 +10,9 @@ interface DraggableBodyRowProps extends React.HTMLAttributes<HTMLTableRowElement
     index: number;
     [key: string]: any;
 }
-const DraggableBodyRow = ({ className, style, ...restProps }: DraggableBodyRowProps) => {
-    const index = restProps['data-row-key']
-        ? restProps['data-source'].findIndex((x: any) => x.id === restProps['data-row-key'])
-        : 0;
-    console.log(className, style, restProps)
+const DraggableBodyRow = ({ index, className, style, ...restProps }: DraggableBodyRowProps) => {
     return (
-        <Draggable draggableId={restProps['data-row-key']} index={index} key={restProps['data-row-key']}>
+        <Draggable draggableId={String(restProps['data-row-key'])} index={index} key={restProps['data-row-key']}>
             {(provided, snapshot) => (
 
                 <tr
@@ -76,6 +72,15 @@ export default function ProductType() {
 
             console.log(sortIds);
 
+            typeSort({ ids: sortIds }).then(res => {
+                message.open({
+                    type: res.code == 200 ? 'success' : 'error',
+                    content: res.message,
+                });
+                if (res.code == 200) {
+                    getData()
+                }
+            })
             return newData;
         });
     };
@@ -93,34 +98,23 @@ export default function ProductType() {
         {
             title: '类型',
             dataIndex: 'type',
-            width: '40%',
+            width: '60%',
             align: 'center',
         },
-        {
-            title: '创建时间',
-            dataIndex: 'createTime',
-            width: '20%',
-            align: 'center',
-        },
-
         {
             title: '操作',
             dataIndex: '',
             align: 'center',
             render: (_: any, record: any) => (
-                <Flex wrap gap="small">
-                    {/* <Button type="primary" onClick={() => deleteBut(record)} danger>
-                        删除
-                    </Button> */}
-                    <Popconfirm
-                        title="删除"
-                        description="确定删除当前标签吗？"
-                        icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
-                        onConfirm={() => deleteBut(record)}
-                    >
-                        <Button danger>删除</Button>
-                    </Popconfirm>
-                </Flex>
+                <Popconfirm
+                    title="删除"
+                    description="确定删除当前标签吗？"
+                    icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+                    onConfirm={() => deleteBut(record)}
+                >
+                    <Button danger>删除</Button>
+                </Popconfirm>
+
             ),
         },
     ];
@@ -132,44 +126,25 @@ export default function ProductType() {
 
     const handleOk = () => {
         form.submit();
-        // add({ url: imageUrl }).then(res => {
-        //     message.open({
-        //         type: res.data.code == 200 ? 'success' : 'error',
-        //         content: res.data.message,
-        //     });
-        //     setIsModalOpen(false);
-        //     if (res.data.code == 200) {
-        //         setImageUrl("")
-        //         getData()
-        //     }
+        // console.log("123")
 
-        // })
     };
     const deleteBut = (item: any) => {
         deleteItem({ id: item.id }).then(res => {
             message.open({
-                type: res.data.code == 200 ? 'success' : 'error',
-                content: res.data.message,
+                type: res.code == 200 ? 'success' : 'error',
+                content: res.message,
             });
-            if (res.data.code == 200) {
+            if (res.code == 200) {
                 getData()
             }
         })
 
     }
     const getData = () => {
-        setData([
-            { id: '1', type: '手机', createTime: '2024-01-01' },
-            { id: '2', type: '电脑', createTime: '2024-01-02' },
-            { id: '3', type: '平板', createTime: '2024-01-03' },
-            { id: '4', type: '耳机', createTime: '2024-01-04' },
-        ]);
-        // console.log("123")
-        // getList().then(res => {
-        //     console.log(res.data.data)
-        //     setData(res.data.data)
-        //     // console.log(data)
-        // })
+        getList().then(res => {
+            setData(res.data)
+        })
 
     }
     const handleCancel = () => {
@@ -181,7 +156,21 @@ export default function ProductType() {
     };
 
     const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
-        console.log('Success:', values);
+        // console.log('Success:', values);
+        setIsModalOpen(true);
+        addType({ type: values.type }).then(res => {
+            message.open({
+                type: res.code == 200 ? 'success' : 'error',
+                content: res.message,
+            });
+            setIsModalOpen(false);
+            if (res.code == 200) {
+                getData()
+                form.resetFields();
+            }
+
+        })
+
     };
 
     const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
@@ -195,7 +184,6 @@ export default function ProductType() {
             </Button>
             <Modal
                 title="添加标签"
-                // closable={{ 'aria-label': 'Custom Close Button' }}
                 centered={true}
                 open={isModalOpen}
                 onOk={handleOk}
@@ -225,16 +213,6 @@ export default function ProductType() {
                     </Form>
                 </div>
             </Modal>
-            {/* <div className='matop10'>
-                <Table
-                    columns={columns}
-                    dataSource={data}
-                    rowKey="id"
-                    loading={loading}
-                /></div> */}
-
-
-
             <div className='matop10'>
                 <DragDropContext onDragEnd={onDragEnd}>
                     <Droppable droppableId="table-list" direction="vertical">
@@ -251,12 +229,18 @@ export default function ProductType() {
                                     components={{
                                         body: {
                                             wrapper: (props: any) => <tbody {...props} ref={droppableProvided.innerRef} />,
-                                            row: (props: any) => (
-                                                <DraggableBodyRow
-                                                    {...props}
-                                                    data-source={data}
-                                                />
-                                            ),
+                                            row: (props: any) => {
+                                                // ✅ 直接计算 index 传入
+                                                const index = data.findIndex(
+                                                    (item) => item.id === props['data-row-key']
+                                                );
+                                                return (
+                                                    <DraggableBodyRow
+                                                        {...props}
+                                                        index={index}  // ✅ 明确传入 index
+                                                    />
+                                                );
+                                            },
                                         },
                                     }}
                                     pagination={false}

@@ -1,10 +1,10 @@
-// 文件顶部声明（解决 TS 报错）
 
-import CustomRichEditor, { EditorRef } from "@/components/CustomRichEditor";
+
+import TinyMCEEditor, { TinyMCEEditorRef } from '@/components/TinyMCE';
 import UpImg from "@/components/UpImg";
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
-import type { FormProps } from "antd";
-import { Button, Flex, Form, Input, Modal, Tag } from "antd";
+import type { FormProps, SelectProps } from "antd";
+import { Button, Flex, Form, Input, Modal, Select, Tag } from "antd";
 import { useRef, useState } from "react";
 import 'react-quill/dist/quill.snow.css';
 
@@ -27,7 +27,7 @@ const Add: React.FC<AddProps> = ({ isModalOpen, open, typeIndex }) => {
   const [openAdd, setopenAdd] = useState<boolean>(false);
   const [value, setValue] = useState('');
   const [valuex, setValuex] = useState('');
-  const editorRef = useRef<EditorRef>(null);
+  const editorRef = useRef<TinyMCEEditorRef>(null);
   const handleOk = () => {
     setopenAdd(false);
   };
@@ -43,7 +43,18 @@ const Add: React.FC<AddProps> = ({ isModalOpen, open, typeIndex }) => {
   const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (errorInfo) => {
     console.log("Failed:", errorInfo);
   };
+  const options1: SelectProps['options'] = [];
 
+  for (let i = 10; i < 36; i++) {
+    options1.push({
+      label: i.toString(36) + i,
+      value: i.toString(36) + i,
+    });
+  }
+
+  const handleChange1 = (value: string[]) => {
+    console.log(`selected ${value}`);
+  };
 
   // 选项数据
   const options = [
@@ -55,8 +66,31 @@ const Add: React.FC<AddProps> = ({ isModalOpen, open, typeIndex }) => {
     console.log('当前内容:', content); // 获取值
   };
   const sendData = () => {
-    console.log(editorRef.current?.getContent())
+    const html = editorRef.current?.getContent();
+    const text = editorRef.current?.getText();
+    console.log('HTML:', html);
+    console.log('Text:', text);
   }
+
+  // 设置内容
+  const handleSetContent = () => {
+    editorRef.current?.setContent('<p>新的内容</p>');
+  };
+  // 自定义图片上传
+  const handleImageUpload = async (file: File): Promise<string> => {
+    // 这里调用你的上传 API
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const res = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const data = await res.json();
+    return data.data; // 返回图片 URL
+  };
+
   return (
     <>
       <Modal
@@ -102,13 +136,42 @@ const Add: React.FC<AddProps> = ({ isModalOpen, open, typeIndex }) => {
           </Form.Item>
 
           <Form.Item<FieldType>
+            label="商品类型"
+            name="password"
+            rules={[{ required: true, message: "Please input your password!" }]}
+          >
+            <Select
+              defaultValue="lucy"
+            
+              // onChange={handleChange}
+              options={[
+                { value: 'jack', label: 'Jack' },
+                { value: 'lucy', label: 'Lucy' },
+                { value: 'Yiminghe', label: 'yiminghe' },
+                { value: 'disabled', label: 'Disabled', disabled: true },
+              ]}
+            />
+          </Form.Item>
+          <Form.Item<FieldType>
+            label="商品标签"
+            name="password"
+            rules={[{ required: true, message: "Please input your password!" }]}
+          >
+            <Select
+              mode="multiple"
+              allowClear
+              style={{ width: '100%' }}
+              placeholder="Please select"
+              // onChange={handleChange1}
+              options={options1}
+            />
+          </Form.Item> <Form.Item<FieldType>
             label="商品数量"
             name="password"
             rules={[{ required: true, message: "Please input your password!" }]}
           >
             <Input />
           </Form.Item>
-
           <Form.Item<FieldType>
             label="商品单价"
             name="password"
@@ -167,13 +230,15 @@ const Add: React.FC<AddProps> = ({ isModalOpen, open, typeIndex }) => {
             name="password"
             rules={[{ required: true, message: "Please input your password!" }]}
           >
-            <CustomRichEditor
+            <TinyMCEEditor
               ref={editorRef}
-              value={valuex}
-              onChange={handleChange}
-              height="400px"
-              uploadApi="/api/upload"
-              placeholder="请输入商品详情..."
+              height={400}
+              placeholder="请输入商品详情，支持图文混排..."
+              onFileUpload={handleImageUpload}
+              config={{
+                toolbar: 'undo redo | formatselect | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | removeformat preview',
+                plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen help wordcount',
+              }}
             />
           </Form.Item>
         </Form>

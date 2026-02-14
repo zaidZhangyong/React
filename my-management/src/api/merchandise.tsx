@@ -10,3 +10,4 @@ export const typeSort = (params: any) => request.post('/merchandise/updateSort',
 //获取标签
 export const labelList = () => request.get('/merchandise/labelList');
 export const addLabel = (params: any) => request.post('/merchandise/addLabels', params);
+export const deleteLabel = (params: any) => request.post('/merchandise/deleteLabel', params);

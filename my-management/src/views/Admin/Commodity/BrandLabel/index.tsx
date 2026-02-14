@@ -1,5 +1,5 @@
-import { addLabel, labelList } from '@/api/merchandise';
-import { PlusOutlined } from '@ant-design/icons';
+import { addLabel, deleteLabel, labelList } from '@/api/merchandise';
+import { CloseOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Card, Form, Input, message, Modal, Popconfirm, Space, Tag } from 'antd';
 import { useEffect, useState } from 'react';
 
@@ -32,36 +32,36 @@ export default function BrandLabel() {
         if (showData.length == 0) {
             message.warning("请输入标签！！！")
         }
-        console.log(showData)
         addLabel({ labels: showData }).then(res => {
             message.open({
-                type: res.data.code == 200 ? 'success' : 'error',
-                content: res.data.message,
+                type: res.code == 200 ? 'success' : 'error',
+                content: res.message,
             });
-            if (res.data.code == 200) {
+            if (res.code == 200) {
                 getData()
+                setIsModalOpen(false);
             }
             setshowData([])
 
         })
 
-        // setIsModalOpen(false);
+
     };
 
     const handleCancel = () => {
         setIsModalOpen(false);
     };
 
-    const deleteBut = (item: any) => {
-        // deleteItem({ id: item.id }).then(res => {
-        //     message.open({
-        //         type: res.data.code == 200 ? 'success' : 'error',
-        //         content: res.data.message,
-        //     });
-        //     if (res.data.code == 200) {
-        //         getData()
-        //     }
-        // })
+    const deleteBut = (id: any) => {
+        deleteLabel({ id: id }).then(res => {
+            message.open({
+                type: res.code == 200 ? 'success' : 'error',
+                content: res.message,
+            });
+            if (res.code == 200) {
+                getData()
+            }
+        })
 
     }
     const getData = () => {
@@ -71,18 +71,8 @@ export default function BrandLabel() {
         })
 
     }
-    const preventDefault = (e: React.MouseEvent<HTMLElement>) => {
-        e.preventDefault();
-        // console.log('Clicked! But prevent default.');
-    };
 
-    function confirmDelete(key: any): void {
-        throw new Error('Function not implemented.');
-    }
 
-    function cancelDelete(e?: any | undefined): void {
-        throw new Error('Function not implemented.');
-    }
 
 
     const onFinish = (values: any) => {
@@ -99,42 +89,42 @@ export default function BrandLabel() {
         <>
             <Space style={{ width: '100%', display: 'block', }}>
                 <Card title="标签" extra={<Button type="primary" shape="circle" onClick={showModal} icon={<PlusOutlined />} />} style={{ width: "100%", minHeight: "400px" }}>
-                    <Popconfirm
-                        title="标签标签"
-                        description={`确定要删除此标签吗？`}
-                        onConfirm={() => confirmDelete("1")}
-                        onCancel={cancelDelete}
-                        okText="确认"
-                        cancelText="取消"
-                        placement="topRight"
-                        trigger="click"
-                        mouseLeaveDelay={0.1}
-                    >
-                        {dataList.map((item, index) => (
-                            <Tag
-                                key={item.id}
-                                style={{
-                                    paddingLeft: "10px",
-                                    paddingRight: "10px",
-                                    marginBottom: "8px"  // 标签间距
-                                }}
-                                closeIcon
-                                onClose={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    // 删除标签
-                                    const newData = showData.filter((_, i) => i !== index);
-                                    setshowData(newData);
-                                }}
-                            >
-                                {item.label}
-                            </Tag>
-                        ))}
+                    {dataList.map((item, index) => (
+                        <Tag
+                            key={item.id}
+                            style={{
+                                paddingLeft: "10px",
+                                paddingRight: "10px",
+                                marginBottom: "8px"  // 标签间距
+                            }}
+                            closeIcon={
+                                <Popconfirm
+                                    title="删除标签"
+                                    description={`确定要删除标签【${item.label}】吗？`}
+                                    onConfirm={() => deleteBut(item.id)}
+                                    okText="确认"
+                                    cancelText="取消"
+                                    placement="topRight"
+                                    mouseLeaveDelay={0.1}
+                                    // 关键：禁用 Popconfirm 的默认触发，只通过点击关闭图标触发
+                                    trigger="click"
+                                >
+                                    <CloseOutlined style={{ cursor: 'pointer' }} />
+                                </Popconfirm>
+                            }
+                            onClose={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
 
-                        {dataList.length === 0 && <div style={{ color: '#999' }}>暂无标签数据</div>}
+                            }}
+                        >
+                            {item.label}
+                        </Tag>
+                    ))}
 
 
-                    </Popconfirm>
+
+                    {dataList.length === 0 && <div style={{ color: '#999' }}>暂无标签数据</div>}
                     {/* {data.length === 0 && <div style={{ color: '#999' }}>暂无标签数据</div>} */}
 
                 </Card>

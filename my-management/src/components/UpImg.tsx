@@ -7,12 +7,12 @@ import React, { useState } from "react";
 const getBase64 = (img: RcFile, callback: (url: string) => void) => {
   const reader = new FileReader();
   reader.addEventListener("load", () => callback(reader.result as string));
-  console.log(img);
+  // console.log(img);
   reader.readAsDataURL(img);
 };
 
 const beforeUpload = (file: RcFile) => {
-  console.log(file);
+  // console.log(file);
   const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
   if (!isJpgOrPng) {
     message.error("请上传jpg/png格式图片");
@@ -39,7 +39,7 @@ const UpImg: React.FC = () => {
     if (info.file.status === "done") {
       // Get this url from response in real world.
       getBase64(info.file.originFileObj as RcFile, (url) => {
-        console.log(url);
+        // console.log(url);
         setLoading(false);
         setImageUrl(url);
       });

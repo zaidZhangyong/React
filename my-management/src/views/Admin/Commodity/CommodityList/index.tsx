@@ -19,27 +19,27 @@ const CommodityList = () => {
     },
     {
       title: "图片",
-      dataIndex: "picture",
-      key: "picture",
+      dataIndex: "img",
+      key: "img",
       align: "center",
       render: () => <Image width={100} src={icon} />,
     },
     {
       title: "商品名称",
-      dataIndex: "picture",
-      key: "picture",
+      dataIndex: "title",
+      key: "title",
       align: "center",
     },
     {
       title: "商品介绍",
-      dataIndex: "picture",
-      key: "picture",
+      dataIndex: "detali",
+      key: "xxx",
       align: "center",
     },
     {
       title: "商品详情",
-      dataIndex: "picture",
-      key: "picture",
+      dataIndex: "detali",
+      key: "detali",
       align: "center",
     },
     {
@@ -50,14 +50,14 @@ const CommodityList = () => {
     },
     {
       title: "当前数据",
-      dataIndex: "date",
-      key: "date",
+      dataIndex: "date1",
+      key: "date1",
       align: "center",
     },
     {
       title: "操作",
       dataIndex: "",
-      key: "",
+
       align: "center",
       render: () => (
         <Flex
@@ -81,18 +81,11 @@ const CommodityList = () => {
   const data = [
     {
       id: '1',
+      img: ""
     },
 
   ];
   const showModal = () => { };
-  // deleteBoxRef.current?.showModal("确认删除当前图片！！");
-  // };
-  // const setUser = (type: string) => {
-  //   // addBoxRef.current?.showModal(type);
-  // };
-  // const deleteItem = () => {
-  //   // deleteBoxRef.current?.close();
-  // };
   const [loading, setLoadings] = useState<boolean>(false);
   const [typeIndex, setTypeIndex] = useState(true); //true新增 false编辑
   const query = () => {

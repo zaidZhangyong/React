@@ -230,14 +230,13 @@ export default function ProductType() {
                                         body: {
                                             wrapper: (props: any) => <tbody {...props} ref={droppableProvided.innerRef} />,
                                             row: (props: any) => {
-                                                // ✅ 直接计算 index 传入
                                                 const index = data.findIndex(
                                                     (item) => item.id === props['data-row-key']
                                                 );
                                                 return (
                                                     <DraggableBodyRow
                                                         {...props}
-                                                        index={index}  // ✅ 明确传入 index
+                                                        index={index}
                                                     />
                                                 );
                                             },

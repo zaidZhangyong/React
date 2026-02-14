@@ -1,22 +1,13 @@
 // 文件顶部声明（解决 TS 报错）
 
+import CustomRichEditor, { EditorRef } from "@/components/CustomRichEditor";
 import UpImg from "@/components/UpImg";
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import type { FormProps } from "antd";
 import { Button, Flex, Form, Input, Modal, Tag } from "antd";
-import BlotFormatter from 'quill-blot-formatter';
 import { useRef, useState } from "react";
-import ReactQuill, { Quill } from "react-quill";
 import 'react-quill/dist/quill.snow.css';
 
-declare module 'react-quill' {
-  export interface Quill {
-    import: (name: string) => any;
-    register: (path: string, def: any) => void;
-  }
-}
-
-Quill.register('modules/blotFormatter', BlotFormatter);
 
 interface AddProps {
   isModalOpen: boolean;
@@ -35,7 +26,8 @@ const Add: React.FC<AddProps> = ({ isModalOpen, open, typeIndex }) => {
   const [form] = Form.useForm();
   const [openAdd, setopenAdd] = useState<boolean>(false);
   const [value, setValue] = useState('');
-  const quillRef = useRef<ReactQuill>(null);
+  const [valuex, setValuex] = useState('');
+  const editorRef = useRef<EditorRef>(null);
   const handleOk = () => {
     setopenAdd(false);
   };
@@ -51,59 +43,7 @@ const Add: React.FC<AddProps> = ({ isModalOpen, open, typeIndex }) => {
   const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (errorInfo) => {
     console.log("Failed:", errorInfo);
   };
-  const imageHandler = () => {
-    const input = document.createElement('input');
-    input.setAttribute('type', 'file');
-    input.setAttribute('accept', 'image/*');
-    input.click();
 
-    input.onchange = async () => {
-      const file = input.files?.[0];
-      if (file) {
-        // 1. 上传到服务器（示例）
-        const formData = new FormData();
-        formData.append('file', file);
-
-        try {
-          // 替换为你的上传接口
-          const res = await fetch('/api/upload', {
-            method: 'POST',
-            body: formData,
-          });
-          const data = await res.json();
-
-          // 2. 获取真实地址
-          const imageUrl = data.url; // 如: https://your-cdn.com/image.jpg
-
-          // 3. 插入到编辑器
-          const quill = quillRef.current?.getEditor();
-          if (quill) {
-            const range = quill.getSelection();
-            quill.insertEmbed(range?.index || 0, 'image', imageUrl);
-          }
-        } catch (error) {
-          console.error('上传失败:', error);
-        }
-      }
-    };
-  };
-  const modules = {
-    toolbar: [
-      [{ header: [1, 2, 3, false] }],
-      ['bold', 'italic', 'underline'],
-      [{ color: [] }, { background: [] }],
-      ['image', 'video'],
-      [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
-      [{ indent: '-1' }, { indent: '+1' }],
-      [{ align: [] }],
-      [{ direction: 'rtl' }],
-      ['clean'],
-    ],
-    handlers: {
-      image: imageHandler, // 自定义图片处理
-    },
-    blotFormatter: {},
-  };
 
   // 选项数据
   const options = [
@@ -111,15 +51,19 @@ const Add: React.FC<AddProps> = ({ isModalOpen, open, typeIndex }) => {
     { id: 2, name: '颜色', values: ['红', '蓝', '黑', '白'] },
   ];
   const handleChange = (content: string) => {
-    setValue(content);
+    setValuex(content);
     console.log('当前内容:', content); // 获取值
   };
+  const sendData = () => {
+    console.log(editorRef.current?.getContent())
+  }
   return (
     <>
       <Modal
         title="添加商品"
         open={isModalOpen}
         onCancel={() => open(false)}
+        onOk={sendData}
         width={1000}
         styles={{
           body: {
@@ -223,13 +167,13 @@ const Add: React.FC<AddProps> = ({ isModalOpen, open, typeIndex }) => {
             name="password"
             rules={[{ required: true, message: "Please input your password!" }]}
           >
-            <ReactQuill
-              ref={quillRef}
-              theme="snow"
-              modules={modules}
+            <CustomRichEditor
+              ref={editorRef}
+              value={valuex}
               onChange={handleChange}
-              value={value}
-              style={{ height: "400px" }}
+              height="400px"
+              uploadApi="/api/upload"
+              placeholder="请输入商品详情..."
             />
           </Form.Item>
         </Form>
@@ -260,7 +204,6 @@ const Add: React.FC<AddProps> = ({ isModalOpen, open, typeIndex }) => {
             <Input />
           </Form.Item>
 
-          {/* 修复：去掉 name，或包裹单个子元素 */}
           <Form.Item<FieldType>
             label="选项类别"
             rules={[{ required: true, message: 'Please input your password!' }]}

@@ -1,7 +1,8 @@
+import { getList, labelList } from "@/api/merchandise";
 import icon from "@/assets/images/icon2.png";
 import { PlusOutlined } from "@ant-design/icons";
 import { Button, Flex, Form, Image, Input, Select, Table, TableColumnsType } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Add from "./add";
 // import { useRef } from "react";
 // import DeleteModal, { DeleteProps } from "@/components/DeleteModal";
@@ -9,6 +10,16 @@ const CommodityList = () => {
   // const addBoxRef = useRef<ChildRef>(null);
   // const deleteBoxRef = useRef<DeleteProps>(null);
   const [form] = Form.useForm();
+  const [itemData, setItemData] = useState({
+    url: "",
+    name: "",
+    type: 0,
+    labels: [],
+    num: 0,
+    unitPrice: 0,
+    selects: [],
+    detail: ""
+  });
   const columns: TableColumnsType = [
     {
       title: "id",
@@ -96,14 +107,37 @@ const CommodityList = () => {
     form.resetFields();
   };
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+
+  // 修改 useState
+  const [typeData, settypeData] = useState<ProductTypeItem[]>([]);
+
+  const [labeldata, setlabeldata] = useState<BrandLabelItem[]>([]);
+
   const open = (type: boolean) => {
     setIsModalOpen(type);
     setTypeIndex(true);
   };
+  useEffect(() => {
+    getTypeData()
+    getlabeData()
+  }, []);
+  const getTypeData = () => {
+    getList().then(res => {
+      settypeData(res.data)
+      console.log(typeData)
+    })
+
+  }
+  const getlabeData = () => {
+    labelList().then(res => {
+      setlabeldata(res.data)
+    })
+  }
 
   return (
     <>
-      <Add isModalOpen={isModalOpen} open={open} typeIndex={typeIndex} />
+      <Add isModalOpen={isModalOpen} open={open} typeIndex={typeIndex} labeldata={labeldata} typeData={typeData} itemData={itemData} />
       {/* <DeleteModal ref={deleteBoxRef} deleteItem={deleteItem} /> */}
       <div className="FormInline">
         <Form layout="inline" form={form} initialValues={{ layout: "inline" }}>

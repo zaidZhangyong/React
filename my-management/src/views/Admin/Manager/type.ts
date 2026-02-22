@@ -14,10 +14,9 @@ export interface DataType {
 
 
 export type FieldType = {
-    name?: string;
-    age?: string;
-    gender?: string;
-    Email?: string;
+    username?: string;
+    phone?: string;
+    type?: string;
 };
 
 export interface ChildRef {

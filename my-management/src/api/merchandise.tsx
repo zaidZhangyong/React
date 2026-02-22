@@ -1,4 +1,8 @@
 import { request } from '../request/';
+export const getCommodityListAPi = (params: any) => request.post("/merchandise/list", params);
+export const addCommodity = (params: any) => request.post("/merchandise/addCommodity", params);
+export const editCommodity = (params: any) => request.post("/merchandise/editCommodity", params);
+export const deleteCommodity = (params: any) => request.post("/merchandise/deleteCommodity", params);
 //添加标签
 export const addType = (params: any) => request.post("/merchandise/addType", params);
 //获取类型

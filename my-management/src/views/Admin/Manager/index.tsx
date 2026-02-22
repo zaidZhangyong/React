@@ -1,8 +1,9 @@
-import type { GetProp, TableProps } from "antd";
-import { Button, Flex, Form, Input, Select, Table } from "antd";
+import type { FormProps, GetProp, TableProps } from "antd";
+import { Button, Flex, Form, Input, message, Popconfirm, Table } from "antd";
 import { useEffect, useRef, useState } from "react";
 
-import { PlusOutlined } from "@ant-design/icons";
+import { getUserList, userDelete } from "@/api/user";
+import { PlusOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import type { SorterResult } from "antd/es/table/interface";
 import Add from "./add";
 import { ChildRef, DataType, FieldType } from "./type";
@@ -31,34 +32,23 @@ export default function Manager() {
   const columns: ColumnsType<DataType> = [
     {
       title: "姓名",
-      dataIndex: "name",
+      dataIndex: "username",
       //   sorter: true,
       //   render: (name) => `${name.first} ${name.last}`,
-      width: "20%",
+      // width: "20%",
       align: "center",
     },
     {
-      title: "性别",
-      dataIndex: "gender",
-      width: "20%",
-      align: "center",
-    },
-    {
-      title: "年龄",
-      dataIndex: "age",
-      width: "10%",
-      align: "center",
-    },
-    {
-      title: "Email",
-      dataIndex: "email",
+      title: "电话",
+      dataIndex: "phone",
+      // width: "20%",
       align: "center",
     },
     {
       title: "操作",
       dataIndex: "",
       align: "center",
-      render: () => (
+      render: (item) => (
         <Flex
           wrap
           gap="small"
@@ -66,50 +56,60 @@ export default function Manager() {
           align="center" // 垂直居中
           style={{ height: "100%" }}
         >
-          <Button
-            type="primary"
-            onClick={() => {
-              addUser(2);
-            }}
+          <Popconfirm
+            title="删除"
+            description="确定删除当前标签吗？"
+            icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+            onConfirm={() => deleteItem(item.id)}
           >
-            编辑
-          </Button>
-          <Button type="primary" danger>
-            删除
-          </Button>
+            <Button danger>删除</Button>
+          </Popconfirm>
+
         </Flex>
       ),
     },
   ];
-
-  const fetchData = () => {
-    setLoading(true);
-    fetch(`https://randomuser.me/api`)
-      .then((res) => res.json())
-      .then(({ results }) => {
-        console.log(results);
-        setData(results);
-        setLoading(false);
-        setTableParams({
-          ...tableParams,
-          pagination: {
-            ...tableParams.pagination,
-            total: 200,
-            // 200 is mock data, you should read it from server
-            // total: data.totalCount,
-          },
-        });
+  const deleteItem = (id: number) => {
+    userDelete({ id: id }).then(res => {
+      message.open({
+        type: res.code == 200 ? 'success' : 'error',
+        content: res.message,
       });
+      if (res.code == 200) {
+
+        getList()
+        // getData()
+      }
+    })
+  }
+  const getList = () => {
+    setLoading(true);
+
+    getUserList(form.getFieldValue('phone') || '').then(res => {
+      message.open({
+        type: res.code == 200 ? 'success' : 'error',
+        content: res.message,
+      });
+      if (res.code == 200) {
+
+        setData(res.data)
+        // getData()
+      }
+    })
+
+
+    setLoading(false);
   };
 
   useEffect(() => {
-    fetchData();
+    // fetchData();
+    getList()
   }, [
-    tableParams.pagination?.current,
-    tableParams.pagination?.pageSize,
-    tableParams?.sortOrder,
-    tableParams?.sortField,
-    JSON.stringify(tableParams.filters),
+    // tableParams.pagination?.current,
+    // tableParams.pagination?.pageSize,
+    // tableParams?.sortOrder,
+    // tableParams?.sortField,
+    // JSON.stringify(tableParams.filters),
   ]);
 
   const handleTableChange: TableProps<DataType>["onChange"] = (
@@ -136,10 +136,22 @@ export default function Manager() {
   const handleChange = (value: string) => {
     console.log(`selected ${value}`);
   };
+  const onchange = () => {
+    getList()
+  }
+  const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
+    getList()
+  }
+  const onReset = () => {
+    // setLoadings(false);
+
+    form.resetFields();
+    getList()
+  };
   return (
     <>
       {/* 添加编辑 */}
-      <Add ref={addBoxRef} />
+      <Add ref={addBoxRef} onchange={onchange} />
 
       <div className="flexSB">
         <div>
@@ -147,26 +159,18 @@ export default function Manager() {
             layout="inline"
             form={form}
             initialValues={{ layout: "inline" }}
+            onFinish={onFinish}
+
           >
-            <Form.Item label="姓名:">
-              <Input placeholder="请输入姓名" />
+            <Form.Item name="phone" label="电话:">
+              <Input placeholder="请输入电话" />
             </Form.Item>
-            <Form.Item label="年龄:">
-              <Input placeholder="请输入年龄" />
-            </Form.Item>
-            <Form.Item label="性别:">
-              <Select
-                placeholder="请选择性别"
-                style={{ width: 120 }}
-                onChange={handleChange}
-                options={[
-                  { value: "1", label: "男" },
-                  { value: "2", label: "女" },
-                ]}
-              />
-            </Form.Item>
+
             <Form.Item>
-              <Button type="primary">Submit</Button>
+              <Button type="primary" onClick={onFinish}>Submit</Button>
+              <Button type="primary" onClick={() => onReset()} style={{marginLeft:"10px"}}>
+                Reset
+              </Button>
             </Form.Item>
           </Form>
         </div>
@@ -185,7 +189,7 @@ export default function Manager() {
       <div className="matop10">
         <Table
           columns={columns}
-          rowKey={(record) => record.login.uuid}
+          // rowKey={(record) => record.login.uuid}
           dataSource={data}
           pagination={tableParams.pagination}
           loading={loading}

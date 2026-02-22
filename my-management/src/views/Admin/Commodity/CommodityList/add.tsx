@@ -1,19 +1,21 @@
 
 
+import { addCommodity, editCommodity } from '@/api/merchandise';
 import TinyMCEEditor, { TinyMCEEditorRef } from '@/components/TinyMCE';
 import UpImg from "@/components/UpImg";
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import type { FormProps } from "antd";
-import { Button, Flex, Form, Input, Modal, Select, Tag } from "antd";
+import { Button, Flex, Form, Input, message, Modal, Select, Tag } from "antd";
 import { useEffect, useRef, useState } from "react";
 import 'react-quill/dist/quill.snow.css';
 
-const Add: React.FC<AddProps> = ({ isModalOpen, open, typeIndex, labeldata, typeData, itemData }) => {
+const Add: React.FC<AddProps> = ({ isModalOpen, open, typeIndex, labeldata, typeList, itemData }) => {
   const [form] = Form.useForm();   // 商品主表单         // 主表单（商品）
   const [optionForm] = Form.useForm();// 选项子表单
 
   const [openAdd, setopenAdd] = useState<boolean>(false);
   const [valuex, setValuex] = useState('');
+  const [url, seturl] = useState<string>();
   const [optionItem, setoptionItem] = useState({ name: "", values: [{ id: Date.now(), text: "" }] })
   // 选项数据
   const [itemOptions, setitemOptions] = useState<SelectItem[]>([])
@@ -36,12 +38,7 @@ const Add: React.FC<AddProps> = ({ isModalOpen, open, typeIndex, labeldata, type
     label: item.label,
   })
   )
-  const typeList = typeData.map(item =>
-  ({
-    value: item.id, // 把 id 作为 value
-    label: item.type,
-  })
-  )
+
   const handleOk = () => {
     optionForm.submit();
 
@@ -52,20 +49,25 @@ const Add: React.FC<AddProps> = ({ isModalOpen, open, typeIndex, labeldata, type
   };
   useEffect(() => {
     if (isModalOpen) {
+      console.log(itemData, 555)
       form.setFieldsValue({
+        id: itemData.id,
         url: itemData.url,
         name: itemData.name,
-        type: itemData.type,
+        typeId: itemData.typeId,
         labels: itemData.labels,
-        num: itemData.num,
+        quantity: itemData.quantity,
         unitPrice: itemData.unitPrice,
         selects: itemData.selects,
         detail: itemData.detail,
+        status: itemData.id ? itemData.status : undefined
       });
-
+      seturl(itemData.url);
+      setitemOptions(itemData.selects || [])
+      // console.log(url)
       // 如果有富文本内容，单独设置
       if (itemData.detail && editorRef.current) {
-        // editorRef.current.setContent(itemData.detail);
+        editorRef.current.setContent(itemData.detail);
       }
     } else {
       // 关闭时重置
@@ -76,22 +78,64 @@ const Add: React.FC<AddProps> = ({ isModalOpen, open, typeIndex, labeldata, type
   const onInit = () => {
     console.log(133)
   }
+  const getImg = (img: string) => {
+    form.setFieldsValue({ url: img });
+
+  }
   const onFinish: FormProps<SelectItem>["onFinish"] = (values) => {
+    console.log(values)
+    console.log(123)
+    if (values.id) {
+      editCommodity(values).then(res => {
+        // console.log(res)
+        message.open({
+          type: res.code == 200 ? 'success' : 'error',
+          content: res.message,
+        });
+
+        if (res.code == 200) {
+          open(false)
+          form.resetFields();
+        }
+
+      })
+    } else {
+      addCommodity(values).then(res => {
+        // console.log(res)
+        message.open({
+          type: res.code == 200 ? 'success' : 'error',
+          content: res.message,
+        });
+
+        if (res.code == 200) {
+          open(false)
+          form.resetFields();
+        }
+
+      })
+    }
 
   };
+
   const onFinishItem: FormProps<SelectItem>["onFinish"] = (values) => {
-    console.log(values)
     const newOption: SelectItem = {
       ...values,
-      id: Date.now(), // 用时间戳生成唯一id
-      values: values.values.map((item: any) => item.text.trim())
+      id: Date.now() + Math.floor(Math.random() * 1000), // 用时间戳生成唯一id
+      values: values.values.map((item: any) => {
+        return {
+          text: item.text.trim(),
+          id: Date.now() + Math.floor(Math.random() * 1000)
+        }
+      })
 
     };
-    setitemOptions(prevOptions => [...prevOptions, newOption]);
-    console.log(itemOptions)
+    const newOptions = [...itemOptions, newOption];
+    console.log(newOptions)
+    setitemOptions(newOptions);
+    form.setFieldsValue({ selects: newOptions });
     setopenAdd(false)
     optionForm.resetFields();
-    // 
+
   };
 
   const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (errorInfo) => {
@@ -116,7 +160,7 @@ const Add: React.FC<AddProps> = ({ isModalOpen, open, typeIndex, labeldata, type
     console.log('当前内容:', content); // 获取值
   };
   const sendData = () => {
-
+    form.submit();
     // const html = editorRef.current?.getContent();
     // const text = editorRef.current?.getText();
     // console.log('HTML:', html);
@@ -145,7 +189,7 @@ const Add: React.FC<AddProps> = ({ isModalOpen, open, typeIndex, labeldata, type
   return (
     <>
       <Modal
-        title={typeIndex == true ? "添加商品" : "编辑商品"}
+        title={typeIndex == 1 ? "添加商品" : "编辑商品"}
         open={isModalOpen}
         onCancel={() => open(false)}
         onOk={sendData}
@@ -164,17 +208,25 @@ const Add: React.FC<AddProps> = ({ isModalOpen, open, typeIndex, labeldata, type
           wrapperCol={{ span: 16 }}
           style={{ maxWidth: 1000 }}
           initialValues={{ remember: true }}
+          form={form}
           onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
+          // onFinishFailed={onFinishFailed}
           autoComplete="off"
         >
+          <Form.Item<FieldType>
+            label="id"
+            name="id"
+            hidden
+          >
+
+          </Form.Item>
           <Form.Item<FieldType>
             label="商品图片"
             name="url"
             rules={[{ required: true, message: "请选择商品图片" }]}
           >
             <div style={{ width: "300px", height: "150px" }}>
-              <UpImg />
+              <UpImg getImg={getImg} url={url} />
             </div>
           </Form.Item>
 
@@ -185,16 +237,29 @@ const Add: React.FC<AddProps> = ({ isModalOpen, open, typeIndex, labeldata, type
           >
             <Input placeholder="请输入商品名称" />
           </Form.Item>
+          <Form.Item<FieldType   >
+            label="商品状态"
+            name="status"
+            hidden={!itemData.id}
+          >
 
+            <Select
+              options={[
+                { value: 1, label: '上架' },
+                { value: 0, label: '下架' },
+
+              ]}
+
+            />
+          </Form.Item>
           <Form.Item<FieldType>
             label="商品类型"
-            name="type"
+            name="typeId"
             rules={[{ required: true, message: "请选择商品类型" }]}
           >
             <Select
-              // defaultValue=""
-              placeholder="请选择商品类型"
               options={typeList}
+              placeholder="请选择商品类型"
             />
           </Form.Item>
           <Form.Item<FieldType>
@@ -212,17 +277,18 @@ const Add: React.FC<AddProps> = ({ isModalOpen, open, typeIndex, labeldata, type
             />
           </Form.Item> <Form.Item<FieldType>
             label="商品数量"
-            name="num"
+
+            name="quantity"
             rules={[{ required: true, message: "请输入商品数量" }]}
           >
-            <Input placeholder="请输入商品数量" />
+            <Input type='number' placeholder="请输入商品数量" />
           </Form.Item>
           <Form.Item<FieldType>
             label="商品单价"
             name="unitPrice"
             rules={[{ required: true, message: "请输入商品单价" }]}
           >
-            <Input placeholder="请输入商品单价" />
+            <Input type='number' placeholder="请输入商品单价" />
           </Form.Item>
 
 
@@ -256,8 +322,8 @@ const Add: React.FC<AddProps> = ({ isModalOpen, open, typeIndex, labeldata, type
                   </div>
                   <div style={{ marginTop: "5px" }}>
                     <Flex gap="small" align="center" wrap>
-                      {opt.values.map((val: string, idx: number) => (
-                        <Tag key={`${opt.id}-${idx}`}>{val}</Tag>
+                      {opt.values.map((val: { id: number | string; text: string }) => (
+                        <Tag key={val.id}>{val.text}</Tag>
                       ))}
                     </Flex>
                   </div>
@@ -383,3 +449,7 @@ const Add: React.FC<AddProps> = ({ isModalOpen, open, typeIndex, labeldata, type
 };
 
 export default Add;
+
+function getData() {
+  throw new Error('Function not implemented.');
+}

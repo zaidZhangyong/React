@@ -17,9 +17,9 @@ const PersonalInformation = lazy(
 ); //使用懒加载
 const ChangePassword = lazy(() => import("@/views/Admin/ChangePassword")); //使用懒加载
 const BrandLabel = lazy(() => import("@/views/Admin/Commodity/BrandLabel")); //使用懒加载
-const Chat = lazy(() => import("@/views/Admin/Chat"));
-const ChatList = lazy(() => import("@/views/Admin/Chat/chatList"));
-const AddUser = lazy(() => import("@/views/Admin/Chat/addUser"));
+// const Chat = lazy(() => import("@/views/Admin/Chat"));
+// const ChatList = lazy(() => import("@/views/Admin/Chat/chatList"));
+// const AddUser = lazy(() => import("@/views/Admin/Chat/addUser"));
 const CommodityList = lazy(
   () => import("@/views/Admin/Commodity/CommodityList")
 );
@@ -47,7 +47,6 @@ const routes = [
         key: "home",
         element: <Home />,
       },
-
       {
         title: "商品",
         icon: "ShopOutlined",

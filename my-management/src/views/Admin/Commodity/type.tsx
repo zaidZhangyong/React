@@ -4,29 +4,33 @@ interface BrandLabelItem {
 }
 
 interface ProductTypeItem {
+    value: any;
     id: number;
     type: string;
     createTime: string;
+    label?: string
 }
 
 interface AddProps {
     isModalOpen: boolean;
     open: (visible: boolean) => void;
-    typeIndex: boolean;
+    typeIndex: number;
     labeldata: BrandLabelItem[]
-    typeData: ProductTypeItem[]
+    typeList: ProductTypeItem[]
     itemData: FieldType;
 }
 
 type FieldType = {
+    id?: number ;
     url?: string;
     name?: string;
-    type?: number;
+    typeId?: number | null;
     labels?: number[];
-    num?: number
-    unitPrice?: number
+    quantity?: number | string
+    unitPrice?: number | string
     selects?: SelectItem[]
     detail?: string
+    status?:number
 };
 interface SelectItem {
     id: string | number,

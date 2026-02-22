@@ -10,7 +10,10 @@ const getBase64 = (img: RcFile, callback: (url: string) => void) => {
   // console.log(img);
   reader.readAsDataURL(img);
 };
-
+interface UpImgProps {
+  getImg?: (url: string) => void; // 回调函数：接收图片地址
+  url?: string | undefined
+}
 const beforeUpload = (file: RcFile) => {
   // console.log(file);
   const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
@@ -24,14 +27,14 @@ const beforeUpload = (file: RcFile) => {
   return isJpgOrPng;
 };
 
-const UpImg: React.FC = () => {
+const UpImg: React.FC<UpImgProps> = ({ getImg, url }) => {
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string>();
 
   const handleChange: UploadProps["onChange"] = (
     info: UploadChangeParam<UploadFile>
   ) => {
-    console.log(info.file.status);
+
     if (info.file.status === "uploading") {
       setLoading(true);
       return;
@@ -39,9 +42,13 @@ const UpImg: React.FC = () => {
     if (info.file.status === "done") {
       // Get this url from response in real world.
       getBase64(info.file.originFileObj as RcFile, (url) => {
+        if (getImg) {
+          getImg(info.file.response.data);
+        }
         // console.log(url);
         setLoading(false);
         setImageUrl(url);
+
       });
     }
   };
@@ -55,16 +62,17 @@ const UpImg: React.FC = () => {
 
   return (
     <Upload
-      name="avatar"
+      name="file"
       listType="picture-card"
       className="avatar-uploader"
       showUploadList={false}
-      action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+      action="/api/upload"
       beforeUpload={beforeUpload}
       onChange={handleChange}
     >
-      {imageUrl ? (
-        <img src={imageUrl} alt="avatar" style={{ width: "100%" }} />
+      {/* {url || imageUrl} */}
+      {url || imageUrl ? (
+        <img src={url || imageUrl} alt="avatar" style={{ width: "100%" }} />
       ) : (
         uploadButton
       )}
@@ -73,3 +81,4 @@ const UpImg: React.FC = () => {
 };
 
 export default UpImg;
+

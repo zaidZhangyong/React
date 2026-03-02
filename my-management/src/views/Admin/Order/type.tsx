@@ -7,6 +7,7 @@ export interface DataType {
     address?: string;
     detailedAddress?: string;
     createTime?: string;
+    status?: number
 }
 
 
@@ -20,4 +21,5 @@ export type FieldType = {
     username?: string;
     phone?: string;
     type?: string;
+
 };

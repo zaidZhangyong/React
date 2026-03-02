@@ -1,287 +1,220 @@
-import { deleteItem } from '@/api/swiper';
-import { QuestionCircleOutlined } from '@ant-design/icons';
-import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea/dnd'; // 或 'react-beautiful-dnd'
-import { Button, Form, FormProps, Input, message, Popconfirm } from 'antd';
-import Table, { ColumnsType } from 'antd/es/table';
-import { useEffect, useState } from 'react';
+import type { FormProps, GetProp, TableProps } from "antd";
+import { Button, Form, Input, message, Select, Table, Tag } from "antd";
+import { useEffect, useRef, useState } from "react";
 
-// 拖拽表格行组件
-interface DraggableBodyRowProps extends React.HTMLAttributes<HTMLTableRowElement> {
-    index: number;
-    [key: string]: any;
+import { getDataList } from "@/api/order";
+import type { SorterResult } from "antd/es/table/interface";
+// import Add from "./add";
+import { ChildRef, DataType, FieldType } from "./type";
+type ColumnsType<T extends object = object> = TableProps<T>["columns"];
+type TablePaginationConfig = Exclude<
+    GetProp<TableProps, "pagination">,
+    boolean
+>;
+interface TableParams {
+    pagination?: TablePaginationConfig;
+    sortField?: SorterResult<unknown>["field"];
+    sortOrder?: SorterResult<unknown>["order"];
+    filters?: Parameters<GetProp<TableProps, "onChange">>[1];
 }
-const DraggableBodyRow = ({ className, style, ...restProps }: DraggableBodyRowProps) => {
-    const index = restProps['data-row-key']
-        ? restProps['data-source'].findIndex((x: any) => x.id === restProps['data-row-key'])
-        : 0;
-    console.log(className, style, restProps)
-    return (
-        <Draggable draggableId={restProps['data-row-key']} index={index} key={restProps['data-row-key']}>
-            {(provided, snapshot) => (
 
-                <tr
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    className={`${className} ${snapshot.isDragging ? 'dragging' : ''}`}
-                    style={{
-                        ...provided.draggableProps.style,
-                        // 关键：拖拽时保持布局
-                        position: snapshot.isDragging ? 'relative' : 'static',
-                        left: snapshot.isDragging ? 0 : undefined,
-                        top: snapshot.isDragging ? 0 : undefined,
-                        width: '100%',
-                        boxSizing: 'border-box',
-                    }}
-                    {...restProps}
-                />
-            )}
-        </Draggable>
-    );
-};
-export default function ProductType() {
-    interface ProductTypeItem {
-        id: string;
-        type: string;
-        createTime: string;
-    }
-
-    // 修改 useState
-    const [data, setData] = useState<ProductTypeItem[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [form] = Form.useForm(); // 创建 form 实例
-    useEffect(() => {
-
-        getData()
-    }, []);
-
-
-    // 拖拽结束处理
-    const onDragEnd = (result: DropResult) => {
-        const { destination, source } = result;
-
-        // 没放到有效位置
-        if (!destination) return;
-
-        // 位置没变
-        if (destination.index === source.index) return;
-
-        setData((prevData) => {
-            const newData = Array.from(prevData);
-            const [movedItem] = newData.splice(source.index, 1);
-            newData.splice(destination.index, 0, movedItem);
-
-            // 调用后端保存排序
-            const sortIds = newData.map(item => item.id);
-
-            console.log(sortIds);
-
-            return newData;
-        });
+export default function AccountManagement() {
+    const [data, setData] = useState<DataType[]>();
+    const addBoxRef = useRef<ChildRef>(null);
+    const [loading, setLoading] = useState(false);
+    const [tableParams, setTableParams] = useState<TableParams>({
+        pagination: {
+            current: 1,
+            pageSize: 10,
+        },
+    });
+    const statusMap = {
+        0: { text: '待支付', color: 'orange' },    // 或者 color: 'warning'
+        1: { text: '已支付', color: 'blue' },      // 或者 color: 'processing'
+        2: { text: '已完成', color: 'green' },     // 或者 color: 'success'
+        3: { text: '已取消', color: 'red' },       // 或者 color: 'error'
     };
 
-
-    const columns: ColumnsType = [
+    const columns: ColumnsType<DataType> = [
         {
-            title: 'id',
-            dataIndex: 'id',
-            key: "id",
-            // width: '20%',
-            align: 'center',
+            title: "订单号",
+            dataIndex: "orderNum",
+            //   sorter: true,
+            //   render: (name) => `${name.first} ${name.last}`,
+            width: "20%",
+            align: "center",
         },
         {
-            title: '订单编号',
-            dataIndex: 'id',
-            key: "id",
-            // width: '20%',
-            align: 'center',
+            title: "数量",
+            dataIndex: "number",
+            //   sorter: true,
+            //   render: (name) => `${name.first} ${name.last}`,
+            width: "20%",
+            align: "center",
         },
         {
-            title: '生成时间',
-            dataIndex: 'type',
-            // width: '40%',
-            align: 'center',
+            title: "单价",
+            dataIndex: "price",
+            //   sorter: true,
+            //   render: (name) => `${name.first} ${name.last}`,
+            width: "20%",
+            align: "center",
         },
         {
-            title: '账号名字',
-            dataIndex: 'type',
-            // width: '40%',
-            align: 'center',
-        },
-        {
-            title: '商品名称',
-            dataIndex: 'type',
-            // width: '40%',
-            align: 'center',
-        },
-        {
-            title: '数量',
-            dataIndex: 'type',
-            // width: '40%',
-            align: 'center',
-        },
-        {
-            title: '单价',
-            dataIndex: 'createTime',
-            width: '20%',
-            align: 'center',
-        },
-        {
-            title: '总价',
-            dataIndex: 'type',
-            // width: '40%',
-            align: 'center',
-        },
-        {
-            title: '当前状态',
-            dataIndex: 'type',
-            // width: '40%',
-            align: 'center',
+            title: "总价",
+            dataIndex: "totalPrice",
+            //   sorter: true,
+            //   render: (name) => `${name.first} ${name.last}`,
+            width: "20%",
+            align: "center",
         },
 
-
         {
-            title: '操作',
-            dataIndex: '',
-            align: 'center',
-            render: (_: any, record: any) => (
-                <Popconfirm
-                    title="删除"
-                    description="确定删除当前标签吗？"
-                    icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
-                    onConfirm={() => deleteBut(record)}
-                >
-                    <Button danger>删除</Button>
-                </Popconfirm>
+            title: "状态",
+            dataIndex: "status",
+            //   sorter: true,
+            //   render: (name) => `${name.first} ${name.last}`,
+            width: "20%",
+            align: "center",
+            render: (text, record) => {
+                const status = record.status ?? -1;
+                console.log(status)
+                // 定义状态映射：值 -> { 文字, 颜色/类型 }
+                // color 可以是具体颜色字符串 ('red', 'green') 或 Antd 预设语义色 ('success', 'processing', 'error', 'default')
 
-            ),
+
+                // 获取当前状态配置，如果找不到对应的状态，显示默认值
+                const config = statusMap[status as keyof typeof statusMap] || {
+                    text: '未知状态',
+                    color: 'default',
+                };
+
+                return (
+                    <Tag color={config.color} style={{ fontWeight: 'bold', minWidth: '60px', textAlign: 'center' }}>
+                        {config.text}
+                    </Tag>
+                );
+            }
+        },
+        {
+            title: "创建时间",
+            dataIndex: "createTime",
+            width: "10%",
+            align: "center",
         },
     ];
-    const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const showModal = () => {
-        setIsModalOpen(true);
-    };
-
-    const handleOk = () => {
-        form.submit();
-        // add({ url: imageUrl }).then(res => {
-        //     message.open({
-        //         type: res.data.code == 200 ? 'success' : 'error',
-        //         content: res.data.message,
-        //     });
-        //     setIsModalOpen(false);
-        //     if (res.data.code == 200) {
-        //         setImageUrl("")
-        //         getData()
-        //     }
-
-        // })
-    };
-    const deleteBut = (item: any) => {
-        deleteItem({ id: item.id }).then(res => {
+    const getList = () => {
+        console.log(555)
+        setLoading(true);
+        getDataList({
+            "status": form.getFieldValue('status'),
+            "orderNum": form.getFieldValue('orderNum')
+        }).then(res => {
             message.open({
-                type: res.data.code == 200 ? 'success' : 'error',
-                content: res.data.message,
+                type: res.code == 200 ? 'success' : 'error',
+                content: res.message,
             });
-            if (res.data.code == 200) {
-                getData()
+            if (res.code == 200) {
+                console.log(res.data)
+
+                setData(res.data)
+                // getData()
             }
         })
-
-    }
-    const getData = () => {
-        setData([
-            { id: '1', type: '手机', createTime: '2024-01-01' },
-            { id: '2', type: '电脑', createTime: '2024-01-02' },
-            { id: '3', type: '平板', createTime: '2024-01-03' },
-            { id: '4', type: '耳机', createTime: '2024-01-04' },
-        ]);
-        // console.log("123")
-        // getList().then(res => {
-        //     console.log(res.data.data)
-        //     setData(res.data.data)
-        //     // console.log(data)
-        // })
-
-    }
-    const handleCancel = () => {
-        setIsModalOpen(false);
+        setLoading(false);
     };
 
-    type FieldType = {
-        type?: string;
+    useEffect(() => {
+        getList();
+    }, [
+
+    ]);
+
+    const handleTableChange: TableProps<DataType>["onChange"] = (
+        pagination,
+        filters,
+        sorter
+    ) => {
+        setTableParams({
+            pagination,
+            filters,
+            sortOrder: Array.isArray(sorter) ? undefined : sorter.order,
+            sortField: Array.isArray(sorter) ? undefined : sorter.field,
+        });
+
+        // `dataSource` is useless since `pageSize` changed
+        if (pagination.pageSize !== tableParams.pagination?.pageSize) {
+            setData([]);
+        }
+    };
+    const addUser = (type: number, item?: FieldType) => {
+        addBoxRef?.current?.showModal(type, item);
     };
 
+    const [form] = Form.useForm();
+
+    const onchange = () => {
+        getList()
+    }
     const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
-        console.log('Success:', values);
-    };
+        getList()
+    }
+    const onReset = () => {
+        // setLoadings(false);
 
-    const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
-        console.log('Failed:', errorInfo);
+        form.resetFields();
+        getList()
+    }; const handleChange = (value: string) => {
+        console.log(`selected ${value}`);
     };
-
     return (
         <>
-            <Form
-                layout="inline"
-                form={form}
+            {/* 添加编辑 */}
+            {/* <Add ref={addBoxRef} /> */}
 
+            <div className="flexSB">
+                <div>
+                    <Form
+                        layout="inline"
+                        form={form}
+                        initialValues={{ layout: "inline" }}
+                        onFinish={onFinish}
 
-            >
+                    >
+                        <Form.Item name="orderNum" label="电话:">
+                            <Input placeholder="请输入订单编号" />
+                        </Form.Item>
+                        <Form.Item name="status" label="状态:" rules={[{ required: true, message: '请选择状态' }]}>
+                            <Select placeholder="请选择状态" style={{ width: 120 }}>
+                                {Object.entries(statusMap).map(([value, { text }]) => (
+                                    <Select.Option key={value} value={value}>
+                                        {text}
+                                    </Select.Option>
+                                ))}
+                            </Select>
+                        </Form.Item>
 
-                <Form.Item label="订单编号">
-                    <Input placeholder="input placeholder" />
-                </Form.Item>
+                        <Form.Item>
+                            <Button type="primary" onClick={onFinish}>Submit</Button>
+                            <Button type="primary" onClick={() => onReset()} style={{ marginLeft: "10px" }}>
+                                Reset
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                </div>
 
-                <Form.Item>
-                    <Button type="primary">Submit</Button>
-                </Form.Item>
-            </Form>
-            {/* <div className='matop10'>
+            </div >
+            <div className="matop10">
                 <Table
                     columns={columns}
+
                     dataSource={data}
-                    rowKey="id"
+                    pagination={tableParams.pagination}
                     loading={loading}
-                /></div> */}
-
-
-
-            <div className='matop10'>
-                <DragDropContext onDragEnd={onDragEnd}>
-                    <Droppable droppableId="table-list" direction="vertical">
-                        {(droppableProvided) => (
-                            <div
-                                ref={droppableProvided.innerRef}
-                                {...droppableProvided.droppableProps}
-                            >
-                                <Table
-                                    columns={columns}
-                                    dataSource={data}
-                                    rowKey="id"
-                                    loading={loading}
-                                    components={{
-                                        body: {
-                                            wrapper: (props: any) => <tbody {...props} ref={droppableProvided.innerRef} />,
-                                            row: (props: any) => (
-                                                <DraggableBodyRow
-                                                    {...props}
-                                                    data-source={data}
-                                                />
-                                            ),
-                                        },
-                                    }}
-                                    pagination={false}
-                                />
-                                {droppableProvided.placeholder}
-                            </div>
-                        )}
-                    </Droppable>
-                </DragDropContext>
+                    onChange={handleTableChange}
+                />
             </div>
-
         </>
-    )
+    );
 }
-

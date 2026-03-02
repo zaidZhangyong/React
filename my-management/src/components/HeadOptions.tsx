@@ -1,21 +1,20 @@
-import { useState } from "react";
+import icon from "@/assets/images/icon2.png";
+import "@/assets/styles/global.scss";
+import { setShowKey } from "@/store/reducer/navs";
 import {
+  DownOutlined,
+  EditOutlined,
+  FullscreenExitOutlined,
+  FullscreenOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  FullscreenOutlined,
-  FullscreenExitOutlined,
-  UserOutlined,
-  VerticalRightOutlined,
-  EditOutlined,
-  DownOutlined,
+  VerticalRightOutlined
 } from "@ant-design/icons";
-import "@/assets/styles/global.scss";
-import icon from "@/assets/images/icon2.png";
-import TabsBox from "./TabsBox";
-import { Button, Dropdown, Modal } from "antd";
 import type { MenuProps } from "antd";
-import { setShowKey } from "@/store/reducer/navs";
+import { Button, Dropdown, Modal } from "antd";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
+import TabsBox from "./TabsBox";
 // eslint-disable-next-line @typescript-eslint/ban-types
 export default function HeadOptions(props: {
   collapsed: boolean;
@@ -26,11 +25,11 @@ export default function HeadOptions(props: {
 }) {
   const dispatch = useDispatch();
   const items: MenuProps["items"] = [
-    {
-      key: "personalInformation",
-      label: "个人信息",
-      icon: <UserOutlined />,
-    },
+    // {
+    //   key: "personalInformation",
+    //   label: "个人信息",
+    //   icon: <UserOutlined />,
+    // },
     {
       key: "changePassword",
       label: "修改密码",

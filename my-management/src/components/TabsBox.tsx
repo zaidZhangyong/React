@@ -1,23 +1,23 @@
 import "@/assets/styles/global.scss";
-import { Tabs, Dropdown, message } from "antd";
-import type { TabsProps } from "antd";
-import {
-  LoadingOutlined,
-  CloseOutlined,
-  VerticalAlignMiddleOutlined,
-  VerticalAlignTopOutlined,
-  RedoOutlined,
-} from "@ant-design/icons";
-import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "@/store";
 import {
   removeNavs,
-  setShowKey,
   setKeyPath,
   setRefreshKey,
+  setShowKey,
 } from "@/store/reducer/navs";
-import { useNavigate, useLocation } from "react-router-dom";
+import {
+  CloseOutlined,
+  LoadingOutlined,
+  RedoOutlined,
+  VerticalAlignMiddleOutlined,
+  VerticalAlignTopOutlined
+} from "@ant-design/icons";
+import type { TabsProps } from "antd";
+import { Dropdown, message, Tabs } from "antd";
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function TabsBox() {
   const showKey = useSelector((state: RootState) => state.navs.showKey);
@@ -136,11 +136,13 @@ export default function TabsBox() {
 
   const onChange = (key: string) => {
     const item = navs.navsList.filter((item) => item.key == key)[0];
+    console.log(item.keyPath, key)
     dispatch(setKeyPath(item.keyPath));
     dispatch(setShowKey(key));
   };
   const onEdit: TabsProps["onEdit"] = (targetKey, action) => {
     if (action === "remove") {
+      // console.log(targetKey as string)
       modifyNavs("item", targetKey as string);
     }
   };

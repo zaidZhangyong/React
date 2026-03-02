@@ -62,8 +62,6 @@ const CommodityList = () => {
       key: "labels",
       align: "center",
       render: (ids) => {
-        console.log(ids)
-        console.log(labeldata)
         if (!ids || !Array.isArray(ids) || ids.length === 0) {
           return <Tag color="default">无标签</Tag>;
         }
@@ -175,7 +173,6 @@ const CommodityList = () => {
 
   };
   const getCommodityList = (values: any) => {
-
     getCommodityListAPi({
       'pageNum': pageNum,
       'pageSize': 10,
@@ -190,9 +187,7 @@ const CommodityList = () => {
       setTotal(res.data.total)
 
 
-      setTimeout(() => {
-        console.log(dataList)
-      }, 1000);
+
 
     })
 
@@ -211,7 +206,10 @@ const CommodityList = () => {
   const [typeList, settypeList] = useState<ProductTypeItem[]>([]);
 
   const [labeldata, setlabeldata] = useState<BrandLabelItem[]>([]);
-
+  useEffect(() => {
+    query()
+    // 在这里执行更新后的逻辑
+  }, [pageNum]);
   const open = (type: boolean) => {
     if (type == true) {
       setItemData({
@@ -308,7 +306,9 @@ const CommodityList = () => {
         // showQuickJumper: true, // 显示快速跳页
         // pageSizeOptions: ['10', '20', '50'], // 每页条数可选值
       }} onChange={(pagination) => {
-        console.log(pagination)
+        let num = pagination.current as number
+        setPageNum(num);
+
         // 分页变化时重新请求数据
         // setCurrentPage(pagination.current);
         // setPageSize(pagination.pageSize);

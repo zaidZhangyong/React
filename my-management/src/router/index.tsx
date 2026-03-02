@@ -16,6 +16,7 @@ const PersonalInformation = lazy(
   () => import("@/views/Admin/PersonalInformation")
 ); //使用懒加载
 const ChangePassword = lazy(() => import("@/views/Admin/ChangePassword")); //使用懒加载
+const Order = lazy(() => import("@/views/Admin/Order"));
 const BrandLabel = lazy(() => import("@/views/Admin/Commodity/BrandLabel")); //使用懒加载
 // const Chat = lazy(() => import("@/views/Admin/Chat"));
 // const ChatList = lazy(() => import("@/views/Admin/Chat/chatList"));
@@ -113,7 +114,7 @@ const routes = [
         icon: "UserOutlined",
         path: "/Order",
         key: "Order",
-        element: <Management />,
+        element: <Order />,
       },
       {
         title: "图片管理",

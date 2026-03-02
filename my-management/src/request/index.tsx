@@ -1,73 +1,46 @@
-
 import { message } from "antd";
 import axios, { AxiosRequestConfig } from "axios";
 
-//基础URL，axios将会自动拼接在url前
-//process.env.NODE_ENV 判断是否为开发环境 根据不同环境使用不同的baseURL 方便调试
-const baseURL =
-  process.env.NODE_ENV === "development" ? "/api/" : "https://your.domain.com/api";
-
-
-// //默认请求超时时间
+const baseURL = process.env.NODE_ENV === "development" ? "/api/" : "";
 const timeout = 30000;
 
-// //创建axios实例
 const service = axios.create({
   timeout,
   baseURL,
-  //如需要携带cookie 该值需设为true
   withCredentials: true,
 });
 
-// //统一请求拦截 可配置自定义headers 例如 language、token等
+// 请求拦截器（无改动）
 service.interceptors.request.use(
-
   (config: any) => {
-    // console.log(config)
-    //配置自定义请求头
     let customHeaders = {
       ...config.headers,
       language: 'zh-cn',
       'Content-Type': 'application/json',
-      'Authorization': localStorage.getItem('userToken') || ''
+      'Authorization': `Bearer ${localStorage.getItem('userToken')}` || ''
     };
     config.headers = { ...customHeaders };
-
     return config
   },
   error => {
     console.log(error)
-    Promise.reject(error)
+    return Promise.reject(error) // 补充返回，避免拦截器异常
   }
-)
+);
 
-// //axios返回格式
-interface axiosTypes {
-  data: any;
-  status: number;
-  statusText: string;
-
+// 扩展配置类型，新增 skipBusinessCheck 字段
+interface CustomRequestConfig extends AxiosRequestConfig {
+  skipBusinessCheck?: boolean; // 是否跳过业务校验
 }
 
-//后台响应数据格式
-//###该接口用于规定后台返回的数据格式，意为必须携带code、msg以及result
-//###而result的数据格式 由外部提供。如此即可根据不同需求，定制不同的数据格式
-
-interface responseTypes {
-  data: any;
-  code: number;
-  message: string;
-  result: unknown;
-}
-
-//核心处理代码 将返回一个promise 调用then将可获取响应的业务数据
+// 核心处理代码
 const requestHandler = (
   method: "get" | "post" | "put" | "delete",
   url: string,
   params: object = {},
-  config: AxiosRequestConfig = {}
-): Promise<responseTypes> => {
-  let response: Promise<axiosTypes>;
+  config: CustomRequestConfig = {}
+): Promise<any> => { // 放宽返回类型，适配 blob 和 JSON
+  let response: Promise<any>;
 
   switch (method) {
     case "get":
@@ -82,16 +55,22 @@ const requestHandler = (
     case "delete":
       response = service.delete(url, { params: { ...params }, ...config });
       break;
+    default:
+      return Promise.reject(new Error("不支持的请求方法"));
   }
 
   return new Promise((resolve, reject) => {
     response
       .then((res) => {
-        //业务代码 可根据需求自行处理
+        // 关键：如果配置了跳过业务校验，直接返回原始响应（适配图片等二进制数据）
+        if (config.skipBusinessCheck) {
+          resolve(res); // 返回完整响应（包含 data、status 等）
+          return;
+        }
 
+        // 原有业务校验逻辑（仅针对 JSON 接口）
         const data = res.data;
         if (data.code !== 200) {
-          //特定状态码 处理特定的需求
           if (data.code == 401) {
             message.warning("您的账号已登出或超时，即将登出...");
             console.log("登录异常，执行登出...");
@@ -99,10 +78,8 @@ const requestHandler = (
           const e = JSON.stringify(data);
           message.warning(`请求错误：${JSON.parse(e).message}`);
           console.log(`请求错误：${e}`);
-          //数据请求错误 使用reject将错误返回
           reject(data);
         } else {
-          //数据请求正确 使用resolve将结果返回
           resolve(data);
         }
       })
@@ -115,19 +92,17 @@ const requestHandler = (
   });
 };
 
-
-// 使用 request 统一调用，包括封装的get、post、put、delete等方法
+// 重构 request 方法，透传 skipBusinessCheck 配置
 const request = {
-  get: (url: string, params?: object, config?: AxiosRequestConfig) =>
+  get: (url: string, params?: object, config?: CustomRequestConfig) =>
     requestHandler("get", url, params, config),
-  post: (url: string, params?: object, config?: AxiosRequestConfig) =>
+  post: (url: string, params?: object, config?: CustomRequestConfig) =>
     requestHandler("post", url, params, config),
-  put: (url: string, params?: object, config?: AxiosRequestConfig) =>
+  put: (url: string, params?: object, config?: CustomRequestConfig) =>
     requestHandler("put", url, params, config),
-  delete: (url: string, params?: object, config?: AxiosRequestConfig) =>
+  delete: (url: string, params?: object, config?: CustomRequestConfig) =>
     requestHandler("delete", url, params, config),
 };
 
-// 导出至外层，方便统一使用
 export { request };
 

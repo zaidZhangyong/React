@@ -39,24 +39,20 @@ function Login() {
       localStorage.setItem("userInfo", JSON.stringify(values));
     }
 
-    LoginApi({ account: values.username, ...values })
+    LoginApi({ phone: values.username, ...values })
       .then((res) => {
-        const { code, message: msg, data } = res.data;
-
+        // const { code, message: msg, data } = res.data;
         messageApi.open({
-          type: code === 200 ? "success" : "error",
-          content: msg || (code === 200 ? "登录成功" : "登录失败"),
+          type: res.code === 200 ? "success" : "error",
+          content: res.msg || (res.code === 200 ? "登录成功" : "登录失败"),
         });
 
-        if (code === 200) {
-          localStorage.setItem("userToken", data);
-          navigate("/home");
+        if (res.code === 200) {
+          localStorage.setItem("userToken", res.data);
+          navigate("/home", { replace: true });
         }
       })
-      .catch((err) => {
-        messageApi.error("登录请求失败");
-        console.error(err);
-      });
+
   };
 
   const onFinishFailed: FormProps<loginType>["onFinishFailed"] = (errorInfo) => {
@@ -73,7 +69,7 @@ function Login() {
             <div className={styles.iconBox}>
               <img src={icon} alt="icon" />
             </div>
-            <div className={styles.name}>11111</div>
+            <div className={styles.name}>管理平台</div>
           </div>
           <Form
             name="basic"

@@ -1,16 +1,16 @@
-import { useEffect, useState, useRef } from "react";
-import type { GetProp, TableProps } from "antd";
-import { Table, Button, Flex, Form, Input, Select } from "antd";
+import type { FormProps, GetProp, TableProps } from "antd";
+import { Button, Form, Image, Input, message, Table } from "antd";
+import { useEffect, useRef, useState } from "react";
 
-import { PlusOutlined } from "@ant-design/icons";
+import { getaUserList } from "@/api/user";
 import type { SorterResult } from "antd/es/table/interface";
 import Add from "./add";
+import { ChildRef, DataType, FieldType } from "./type";
 type ColumnsType<T extends object = object> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
   GetProp<TableProps, "pagination">,
   boolean
 >;
-import { ChildRef, FieldType, DataType } from "./type";
 interface TableParams {
   pagination?: TablePaginationConfig;
   sortField?: SorterResult<unknown>["field"];
@@ -28,88 +28,80 @@ export default function AccountManagement() {
       pageSize: 10,
     },
   });
+
+
   const columns: ColumnsType<DataType> = [
     {
       title: "姓名",
-      dataIndex: "name",
+      dataIndex: "username",
       //   sorter: true,
       //   render: (name) => `${name.first} ${name.last}`,
       width: "20%",
       align: "center",
     },
     {
-      title: "性别",
-      dataIndex: "gender",
+      title: "昵称",
+      dataIndex: "nick",
+      //   sorter: true,
+      //   render: (name) => `${name.first} ${name.last}`,
       width: "20%",
       align: "center",
     },
     {
-      title: "年龄",
-      dataIndex: "age",
+      title: "图片",
+      dataIndex: "picturn",
+      key: "picturn",
+      align: "center",
+      render: (text, record) => {
+        if (!record.picturn) return <span>无图片</span>;
+        return <Image width={100} src={record.picturn} />
+      },
+    },
+    {
+      title: "电话",
+      dataIndex: "phone",
+      width: "20%",
+      align: "center",
+    },
+    {
+      title: "地址",
+      dataIndex: "email",
+      align: "center",
+      render: (text, record) => (
+        <span>
+          {record.address || ''}
+          {record.detailedAddress}
+
+        </span>)
+    },
+    {
+      title: "创建时间",
+      dataIndex: "createTime",
       width: "10%",
       align: "center",
     },
-    {
-      title: "Email",
-      dataIndex: "email",
-      align: "center",
-    },
-    {
-      title: "操作",
-      dataIndex: "",
-      align: "center",
-      render: () => (
-        <Flex
-          wrap
-          gap="small"
-          justify="center" // 水平居中
-          align="center" // 垂直居中
-          style={{ height: "100%" }}
-        >
-          <Button
-            type="primary"
-            onClick={() => {
-              addUser(2);
-            }}
-          >
-            编辑
-          </Button>
-          <Button type="primary" danger>
-            删除
-          </Button>
-        </Flex>
-      ),
-    },
   ];
 
-  const fetchData = () => {
+  const getList = () => {
     setLoading(true);
-    fetch(`https://randomuser.me/api`)
-      .then((res) => res.json())
-      .then(({ results }) => {
-        console.log(results);
-        setData(results);
-        setLoading(false);
-        setTableParams({
-          ...tableParams,
-          pagination: {
-            ...tableParams.pagination,
-            total: 200,
-            // 200 is mock data, you should read it from server
-            // total: data.totalCount,
-          },
-        });
+    getaUserList(form.getFieldValue('phone') || '').then(res => {
+      message.open({
+        type: res.code == 200 ? 'success' : 'error',
+        content: res.message,
       });
+      if (res.code == 200) {
+
+        setData(res.data)
+        // getData()
+      }
+    })
+    setLoading(false);
   };
 
   useEffect(() => {
-    fetchData();
+    getList();
   }, [
-    tableParams.pagination?.current,
-    tableParams.pagination?.pageSize,
-    tableParams?.sortOrder,
-    tableParams?.sortField,
-    JSON.stringify(tableParams.filters),
+
   ]);
 
   const handleTableChange: TableProps<DataType>["onChange"] = (
@@ -132,8 +124,21 @@ export default function AccountManagement() {
   const addUser = (type: number, item?: FieldType) => {
     addBoxRef?.current?.showModal(type, item);
   };
+
   const [form] = Form.useForm();
-  const handleChange = (value: string) => {
+
+  const onchange = () => {
+    getList()
+  }
+  const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
+    getList()
+  }
+  const onReset = () => {
+    // setLoadings(false);
+
+    form.resetFields();
+    getList()
+  }; const handleChange = (value: string) => {
     console.log(`selected ${value}`);
   };
   return (
@@ -147,45 +152,27 @@ export default function AccountManagement() {
             layout="inline"
             form={form}
             initialValues={{ layout: "inline" }}
+            onFinish={onFinish}
+
           >
-            <Form.Item label="姓名:">
-              <Input placeholder="请输入姓名" />
+            <Form.Item name="phone" label="电话:">
+              <Input placeholder="请输入电话" />
             </Form.Item>
-            <Form.Item label="年龄:">
-              <Input placeholder="请输入年龄" />
-            </Form.Item>
-            <Form.Item label="性别:">
-              <Select
-                placeholder="请选择性别"
-                style={{ width: 120 }}
-                onChange={handleChange}
-                options={[
-                  { value: "1", label: "男" },
-                  { value: "2", label: "女" },
-                ]}
-              />
-            </Form.Item>
+
             <Form.Item>
-              <Button type="primary">Submit</Button>
+              <Button type="primary" onClick={onFinish}>Submit</Button>
+              <Button type="primary" onClick={() => onReset()} style={{ marginLeft: "10px" }}>
+                Reset
+              </Button>
             </Form.Item>
           </Form>
         </div>
-        <div>
-          <Button
-            type="primary"
-            onClick={() => {
-              addUser(1);
-            }}
-            icon={<PlusOutlined style={{ color: "white" }} />}
-          >
-            添加
-          </Button>
-        </div>
+
       </div>
       <div className="matop10">
         <Table
           columns={columns}
-          rowKey={(record) => record.login.uuid}
+
           dataSource={data}
           pagination={tableParams.pagination}
           loading={loading}

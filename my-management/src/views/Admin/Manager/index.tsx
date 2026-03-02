@@ -1,9 +1,9 @@
 import type { FormProps, GetProp, TableProps } from "antd";
-import { Button, Flex, Form, Input, message, Popconfirm, Table } from "antd";
+import { Button, Form, Input, message, Table } from "antd";
 import { useEffect, useRef, useState } from "react";
 
 import { getUserList, userDelete } from "@/api/user";
-import { PlusOutlined, QuestionCircleOutlined } from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 import type { SorterResult } from "antd/es/table/interface";
 import Add from "./add";
 import { ChildRef, DataType, FieldType } from "./type";
@@ -44,30 +44,30 @@ export default function Manager() {
       // width: "20%",
       align: "center",
     },
-    {
-      title: "操作",
-      dataIndex: "",
-      align: "center",
-      render: (item) => (
-        <Flex
-          wrap
-          gap="small"
-          justify="center" // 水平居中
-          align="center" // 垂直居中
-          style={{ height: "100%" }}
-        >
-          <Popconfirm
-            title="删除"
-            description="确定删除当前标签吗？"
-            icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
-            onConfirm={() => deleteItem(item.id)}
-          >
-            <Button danger>删除</Button>
-          </Popconfirm>
+    // {
+    //   title: "操作",
+    //   dataIndex: "",
+    //   align: "center",
+    //   render: (item) => (
+    //     <Flex
+    //       wrap
+    //       gap="small"
+    //       justify="center" // 水平居中
+    //       align="center" // 垂直居中
+    //       style={{ height: "100%" }}
+    //     >
+    //       <Popconfirm
+    //         title="删除"
+    //         description="确定删除当前标签吗？"
+    //         icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+    //         onConfirm={() => deleteItem(item.id)}
+    //       >
+    //         <Button danger>删除</Button>
+    //       </Popconfirm>
 
-        </Flex>
-      ),
-    },
+    //     </Flex>
+    //   ),
+    // },
   ];
   const deleteItem = (id: number) => {
     userDelete({ id: id }).then(res => {

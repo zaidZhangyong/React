@@ -21,7 +21,7 @@ export default defineConfig({
     proxy: {
       "/api": {
         //目标服务器
-        target: "http://192.168.1.4:8080",
+        target: "http://192.168.1.6:8080",
         //更改请求的Origin
         changeOrigin: true,
         //重写路径
